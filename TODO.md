@@ -43,7 +43,7 @@ Program utilizes alpha beta procedure and runs properly for all 3 difficulty lev
 
 Program does not utilize alpha-beta procedure but runs properly for all 3 difficulty levels. (10)
 
-Program implements 3 dim1ensional tic-tac-toe game but has some errors and the same does not run properly. (5)
+Program implements 3 dimiensional tic-tac-toe game but has some errors and the same does not run properly. (5)
 
 &#x2611; *Nothing (0)*
 
