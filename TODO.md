@@ -4,14 +4,12 @@
   <li>Discuss the project, goals, and task designation.</li>
   <li>Program the game.
     <ul>
-      <li>How is the data about the game stored?</li>
-      <li>How do we represent turns?</li>
-      <li>How do we switch turns/what is the typical game loop?</li>
-      <li>In what form does the data about each turn come in?</li>
-      <li>How are we handling changing the current state of the game after each turn?</li>
-      <li>How are we handling giving information about the current game state of the GUI?</li>
-      <li>How are we handling the difficulty levels of the AI?</li>
-      <li>Does the player get the first turn, does the AI, or is it difficulty dependent?</li>
+      <li>Game stored in 3D Array</li>
+      <li>Turns are Boolean and single-threaded</li>
+      <li>Numbers in the array to store where the Player and AI tokens are.</li>
+      <li>GUI reads the data as we store it.</li>
+      <li>Max depth is based on the difficulty.</li>
+      <li>Player first, then AI.</li>
     </ul>
   </li>
   <li>Program the GUI.
