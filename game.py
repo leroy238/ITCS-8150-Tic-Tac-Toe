@@ -52,6 +52,18 @@ class State:
         return False
     #end play
     
+    # isValid(self, x, y, z)
+    #    Input: self (the object)
+    #    x (the x value of the move)
+    #    y (the y value of the move)
+    #    z (the z value of the move)
+    #    
+    #    Output: Boolean (If move is valid)
+    #
+    #    Returns if a given move would cause an error without playing the move.
+    def isValid(self, x, y, z):
+        return self.gameRepresentation[x,y,z] == 0
+    
     # getState(self)
     #    Input: self (the object)
     #
@@ -190,3 +202,40 @@ class Game:
     gameState = None
     
 #end Game
+
+# actions(state)
+#    Input: state (Current game state)
+#
+#    Output: List (List of actions possible in this state)
+#
+#    Outputs all possible playable moves in a given state.
+def actions(state):
+    actions = []
+    
+    for x in range(4):
+        for y in range(4):
+            for z in range(4):
+                if state.isValid(x,y,z):
+                    actions.append(np.array([x,y,z]))
+                #end if
+            #end for
+        #end for
+    #end for
+    
+    return actions
+#end actions
+
+def result(state, action, player):
+    newState = state.copy()
+    
+    val = 0
+    if player.upper() == 'MAX':
+        val = 1
+    else:
+        val = -1
+    #end if/else
+    
+    newState.play(action[0], action[1], action[2], val)
+    
+    return newState
+#end result
