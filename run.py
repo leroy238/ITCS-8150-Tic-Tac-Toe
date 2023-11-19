@@ -115,7 +115,34 @@ def debug():
 #end debug
 
 def main():
-    return 0
+    while True:
+        gameStart = input('Would you like to start the game? [Y/N]')
+        
+        if gameStart.upper() == 'N':
+            print('Okay! Goodbye.')
+            break
+        elif gameStart.upper() == 'Y':
+            difficulty = input('Difficulty level? [easy/difficult/insane]')
+            
+            maxDepth = 0
+            if difficulty.lower() == 'easy':
+                maxDepth = 2
+            elif difficulty.lower() == 'difficult':
+                maxDepth = 4
+            elif difficulty.lower() == 'insane':
+                maxDepth = 6
+            else:
+                print('Invalid difficulty!')
+                continue
+            #end if/elif/else
+            
+            thisGame = Game(maxDepth)
+            thisGame.run()
+        else:
+            print('Invalid answer!')
+            continue
+        #end if/elif/else
+    #end while
 #end main
 
 def printStatus(status):
