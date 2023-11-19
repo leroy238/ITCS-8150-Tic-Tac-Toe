@@ -51,18 +51,24 @@ class TicTacToe():
           return True
         for col in range(self.dim):
           if row == 0: # to avoid executing this for every pos in layer
-            return self.four_in_a_row(player, self.board[layer][:][col]):
+            if self.four_in_a_row(player, self.board[layer][:][col]):
+              return True
           if layer == 0 and row == 0 and col == 0:
             # check for diagonal across layers
             top_left_to_bottom_right = [self.board[0][row][col], self.board[1][row + 1][col + 1], self.board[2][row + 2][col + 2], self.board[3][row + 3][col + 3]]
-            return self.four_in_a_row(player, top_left_to_bottom_right):
+            if self.four_in_a_row(player, top_left_to_bottom_right):
+              return True
           if layer == 0 and row == 0 and col == self.dim - 1:
             top_right_to_bottom_left = [self.board[0][row][col], self.board[1][row + 1][col - 1], self.board[2][row + 2][col - 2], self.board[3][row + 3][col - 3]]
-            return self.four_in_a_row(player, top_right_to_bottom_left):
+            if self.four_in_a_row(player, top_right_to_bottom_left):
+              return True
+            pass
           if layer == 0:
             # check for straight down
-            return self.four_in_a_row(player, self.board[:][row][col]):
-
+            if self.four_in_a_row(player, self.board[:][row][col]):
+              return True
+    return False
+  
   def is_draw(self):
     flatten = [1 if turn != '-' else 0 for level in self.board for row in level for turn in row]
     return sum(flatten) == self.dim ** 3
