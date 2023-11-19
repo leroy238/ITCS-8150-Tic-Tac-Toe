@@ -68,7 +68,10 @@ class TicTacToe():
             if self.four_in_a_row(player, self.board[:][row][col]):
               return True
 
-          
+  def is_draw(self):
+    flatten = [1 if turn != '-' else 0 for level in self.board for row in level for turn in row]
+    return sum(flatten) == self.dim ** 3
+
   def calculate_state(self):
     if self.has_won(Player.AI):
       self.set_state(GameState.AI_WIN)
