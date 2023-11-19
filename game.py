@@ -247,16 +247,12 @@ class Game:
                 playerTurn = input("Input your turn. Do this in the format 'x, y, z'")
                 
                 turnVal = np.array([0,0,0])
-                currPos = 0
-                nextPos = playerTurn.find(', ', currPos)
                 count = 0
-                while nextPos != -1:
-                    turnVal[count] = int(playerTurn[currPos:nextPos])
-                    currPos = nextPos + 2
-                    nextPos = playerTurn.find(', ', currPos)
+                
+                for val in playerTurn.split(', '):
+                    turnVal[count] = int(val)
                     count += 1
-                #end while
-                turnVal[count] = int(playerTurn[currPos:])
+                #end for
                 
                 self.gameState.play(turnVal[0], turnVal[1], turnVal[2], Token.PLAYER)
             else:
