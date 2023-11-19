@@ -1,5 +1,14 @@
 import numpy as np
 import model
+from enum import Enum
+
+class Turn(Enum):
+    PLAYER = 1
+    AI = 2
+    
+class Token(Enum):
+    PLAYER = -1
+    AI = 1
 
 # This class stores the internal state of the game being played.
 class State:
@@ -27,6 +36,13 @@ class State:
     #    Negative values mean the minimizing player is in a better position,
     #    positive values mean the maximizing player is in a better position.
     def h(self):
+        win, winner = self.isWin()
+        if win and winner == 1:
+            return 100
+        elif win and winner == -1:
+            return -100
+        #end if/elif
+        
         return 1
     # end h
     
@@ -200,7 +216,72 @@ class Game:
     
     aiPlayer = None
     gameState = None
+    turn = None
     
+    # __init__(self, maxDepth)
+    #    Input: self (the object being instantiated)
+    #    maxDepth (the maximum depth that the AI is allowed to search through)
+    #
+    #    Output: None (Side effect of instantiation)
+    #
+    #    Instantiates the Game object, which includes a State and Model object.
+    def __init__(self, maxDepth):
+        self.gameState = State()
+        self.aiPlayer = Model(maxDepth)
+        
+        self.turn = Turn.PLAYER
+    #end __init__
+    
+    # run(self)
+    #    Input: self (the object)
+    #
+    #    Output: None (Side effect of printing out who won)
+    #
+    #    Starts the game, ending when the game is finished and printing out who won.
+    def run(self):
+        winTuple = self.gameState.isWin()
+    
+        while(not winTuple[0]):
+            if self.turn == Turn.PLAYER:
+                # Temporary system of taking in a player's turn.
+                playerTurn = input("Input your turn. Do this in the format 'x, y, z'")
+                
+                turnVal = np.array([0,0,0])
+                currPos = 0
+                nextPos = playerTurn.find(', ', currPos)
+                count = 0
+                while nextPos != -1:
+                    turnVal[count] = int(playerTurn[currPos:nextPos])
+                    currPos = nextPos + 2
+                    nextPos = playerTurn.find(', ', currPos)
+                    count += 1
+                #end while
+                turnVal[count] = int(playerTurn[currPos:])
+                
+                self.gameState.play(turnVal[0], turnVal[1], turnVal[2], Token.PLAYER)
+            else:
+                currState = self.gameState.getState()
+                turnVal = self.aiPlayer.alphaBetaSearch(currState)
+                
+                self.gameState.play(turnVal[0], turnVal[1], turnVal[2], Token.AI)
+            #end if/else
+            
+            # Temporary method of making the game state visible to the player.
+            print(self.gameState.getState())
+            
+            winTuple = self.gameState.isWin()
+        #end while
+        
+        winner = ''
+        if winTuple[1] == 1:
+            winner = 'Player'
+        else:
+            winner = 'AI'
+        #end if/else
+        
+        print(winner + 'has won!')
+    #end run
+
 #end Game
 
 # actions(state)
