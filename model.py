@@ -28,7 +28,7 @@ class Model:
     #
     #    Implements the search of the maximizing player in alpha-beta pruning.
     def maxSearch(self, state, alpha, beta, depth):
-        if self.maxLayers == depth or state.isWin():
+        if self.maxLayers == depth or state.isWin()[0]:
             return (state.h(), [])
         #end if
         

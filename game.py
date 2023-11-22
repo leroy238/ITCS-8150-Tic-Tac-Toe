@@ -163,7 +163,7 @@ class State:
         for x in range(2):
             for y in range(2):
                 for z in range(2):
-                    #Extension [0,0,0] is invalid.
+                    # Extension [0,0,0] is invalid.
                     if x != 0 or y != 0 or z != 0:
                         extensions.append(np.array([x,y,z]))
                     #end if
