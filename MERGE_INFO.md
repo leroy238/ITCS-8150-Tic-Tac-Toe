@@ -17,7 +17,7 @@ Implemented a basic game loop. Takes the user's text input to place a token on t
 ## Sampada
 
 Haven't implemented a game loop, but have created functions to accept the player's (AI or User) input. The input is used to update the board and calculate the current state of the game (Win / Draw / Lose). 
-The game is won if any player has 4 in a row vertically or horizontally in each layer, or diagonally across all layers (top left --> bottom right or top right --> bottom left). I just realized I don't have logic to check for 4 in a row digonally in each layer, but that can be easily added. 
+The game is won if any player has 4 in a row vertically or horizontally in each layer, or diagonally (top left --> bottom right or top right --> bottom left) and straight down across all 3 layers. I just realized I don't have logic to check for 4 in a row digonally in each layer, but that can be easily added. 
 The game is tied if all moves have been made and no player has won, i.e. board has no empty spaces left and game is still in progress.
 No player can make a move in a position that is not empty, this results in an error.
 
