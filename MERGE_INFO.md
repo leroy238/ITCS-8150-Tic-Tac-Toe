@@ -21,6 +21,10 @@ The game is won if any player has 4 in a row vertically or horizontally in each 
 The game is tied if all moves have been made and no player has won, i.e. board has no empty spaces left and game is still in progress.
 No player can make a move in a position that is not empty, this results in an error.
 
+## Bianca
+
+Implemented function for user input, along with the AI's response (in my case a random int function). The users move is based on the number of the desired spot on the board according to 1-16 (n-1). if the user or AI have placed their mark on a spot then the program will return an error "player has already placed mark here." I have logic for wins horizontally, vertically and diagonally.
+
 # Game Information (Board)
 
 ## Justin
@@ -31,3 +35,7 @@ Implemented a game state, which can be copied, has a placeholder heuristic funct
 
 The game board is implemented as a `3 x 4 x 4` 3D array. Its values represent all turns taken by players up to any point in time. 
 The game state is In Progress until either a Win or Draw situation occurs.
+
+## Bianca
+
+Game borad is 4x4, I have not implemented the '3D aspect to the board for player use. It seems like I can add the logic seperately but I am afraid of have redundant and repetitive code to the board implementation.
