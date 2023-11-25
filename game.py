@@ -72,13 +72,14 @@ class State:
             #end for
         #end for
         
-        # Extend each point in each direction.
         score = 0
         
+        # Extend each point in each direction.
         for point in points:
             for direction in extensions:
                 prevVal = 0
                 count = 0
+                tempScore = 0
                 for num in range(4):
                     value = self.gameRepresentation[point[0], point[1], point[2]]
                     # No point 
@@ -91,12 +92,15 @@ class State:
                             # We found another one in the line.
                             # Pos for max, neg for min.
                             # The more that are in a particular direction, the better.
-                            count += value * (count + 1)
+                            count += 1
+                            tempScore += value * (count + 1)
                         else:
                             # Line is blocked. Should not encourage moves like this.
                             count = 0
                         #end if/else
                     #end if
+                    
+                    score += tempScore
                     
                     # We want to encourage points even if they are not directly
                     # in a line. No case for value is 0 is necessary.
@@ -107,6 +111,8 @@ class State:
                 #end for
             #end for
         #end for
+        
+        return score
     # end h
     
     # play(self, x, y, z, player
