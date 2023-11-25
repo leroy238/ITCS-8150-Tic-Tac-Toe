@@ -29,7 +29,7 @@ Implemented function for user input, along with the AI's response (in my case a 
 
 ## Justin
 
-Implemented a game state, which can be copied, has a placeholder heuristic function, and the ability to track a win (ties would be simple to add with a linear search for a 0 (no token). Some quick work should make the win function not have as many duplicates, which do currently show up. The method would also make the function more legible, brief, and efficient, I just didn't think about it while implementing. I'll try to have this done before merge in case we go with this option.
+Implemented a game State, which can be copied for use by the AI, has a utility function, and the ability to track a win and ties. Implements a `4x4x4` 3D numpy array as the board information.
 
 ## Sampada
 
