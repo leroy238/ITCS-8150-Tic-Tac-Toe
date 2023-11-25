@@ -37,13 +37,76 @@ class State:
     #    positive values mean the maximizing player is in a better position.
     def h(self):
         win, winner = self.isWin()
+        # Check if max wins, if min wins, or if tie.
         if win and winner == 1:
             return 100
         elif win and winner == -1:
             return -100
+        elif win and winner == 0:
+            #Heuristic is negative since the AI is maximizing.
+            return -20
         #end if/elif
         
-        return 1
+        # Create extension directions.
+        extensions = []
+        for x in range(2):
+            for y in range(2):
+                for z in range(2):
+                    # Extension [0,0,0] is invalid.
+                    if x != 0 or y != 0 or z != 0:
+                        extensions.append(np.array([x,y,z]))
+                    #end if
+                #end for
+            #end for
+        #end for
+        
+        # Produces all edge points. 
+        points = []
+        for x in range(4):
+            for y in range(4):
+                for z in range(4):
+                    if x == 0 or y == 0 or z == 0:
+                        points.append(np.array[x,y,z])
+                    #end if
+                #end for
+            #end for
+        #end for
+        
+        # Extend each point in each direction.
+        score = 0
+        
+        for point in points:
+            for direction in extensions:
+                prevVal = 0
+                count = 0
+                for num in range(4):
+                    value = self.gameRepresentation[point[0], point[1], point[2]]
+                    # No point 
+                    if value != 0:
+                        if prevVal == 0:
+                            prevVal = value
+                        #end if
+                        
+                        if prevVal == value:
+                            # We found another one in the line.
+                            # Pos for max, neg for min.
+                            # The more that are in a particular direction, the better.
+                            count += value * (count + 1)
+                        else:
+                            # Line is blocked. Should not encourage moves like this.
+                            count = 0
+                        #end if/else
+                    #end if
+                    
+                    # We want to encourage points even if they are not directly
+                    # in a line. No case for value is 0 is necessary.
+                    
+                    point[0] += direction[0]
+                    point[1] += direction[1]
+                    point[2] += direction[2]
+                #end for
+            #end for
+        #end for
     # end h
     
     # play(self, x, y, z, player
@@ -118,6 +181,52 @@ class State:
         return copy_state
     #end copy
     
+    # _potWins(self)
+    #    Input: self (the object)
+    #
+    #    Output: List (list of all points that could include wins)
+    #
+    #    Returns all points with a 0 in some direction (all winning lines have a 0
+    #    in some direction, because they cross the board.
+    def _potWins(self):
+        # Main idea, to get a win, you need a 0 in some dimension.
+        # Loop over pairs of dimensions, 3(4^2) < 4^3
+        # Store all potential wins, see if they work by expanding in each direction.
+        
+        potWins = []
+        for y in range(3):
+            for z in range(3):
+                token = self.gameRepresentation[0, y, z]
+                array = np.array([0,y,z])
+                if token != 0 and array not in potWins:
+                    potWins.append((array,token))
+                #end if
+            #end for
+        #end for
+        
+        for x in range(3):
+            for z in range(3):
+                token = self.gameRepresentation[x, 0, z]
+                array = np.array([x,0,z])
+                if token != 0 and array not in potWins:
+                    potWins.append((array,token))
+                #end if
+            #end for
+        #end for
+        
+        for x in range(3):
+            for y in range(3):
+                token = self.gameRepresentation[x, y, 0]
+                array = np.array([x,y,0])
+                if token != 0 and array not in potWins:
+                    potWins.append((array,token))
+                #end if
+            #end for
+        #end for
+        
+        return potWins
+    #end _potWins
+    
     # isWin(self)
     #    Input: self (the object)
     #
@@ -126,37 +235,7 @@ class State:
     #
     #    Tests if a state is won, and returns the player that won.
     def isWin(self):
-        # Main idea, to get a win, you need a 0 in some dimension.
-        # Loop over pairs of dimensions, saves on redundancy.
-        # Store all potential wins, see if they work by expanding in each direction.
-        
-        potWins = []
-        for y in range(3):
-            for z in range(3):
-                token = self.gameRepresentation[0, y, z]
-                if token != 0:
-                    potWins.append((np.array([0,y,z]),token))
-                #end if
-            #end for
-        #end for
-        
-        for x in range(3):
-            for z in range(3):
-                token = self.gameRepresentation[x, 0, z]
-                if token != 0:
-                    potWins.append((np.array([x,0,z]),token))
-                #end if
-            #end for
-        #end for
-        
-        for x in range(3):
-            for y in range(3):
-                token = self.gameRepresentation[x, y, 0]
-                if token != 0:
-                    potWins.append((np.array([x,y,0]),token))
-                #end if
-            #end for
-        #end for
+        potWins = self._potWins()
         
         # Create extension directions.
         extensions = []
@@ -200,13 +279,27 @@ class State:
                     #end for
                     
                     if winFound:
+                        # Return win + player who won
                         return (True, val)
                     #end if
                 #end if
             #end for
         #end for
         
-        return (False, 0)
+        # Check for tie.
+        for matrix in self.gameRepresentation:
+            for row in matrix:
+                for value in row:
+                    if value == 0:
+                        # Return no win.
+                        return (False, 0)
+                    #end if
+                #end for
+            #end for
+        #end for
+        
+        # Return tie.
+        return (True, 0)
     #end isWin
     
 #end State
