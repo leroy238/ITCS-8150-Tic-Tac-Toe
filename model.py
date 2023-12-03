@@ -35,9 +35,9 @@ class Model:
         utility = -float('inf')
         maxAction = [0,0,0]
         
-        for action in actions(state):
-            newState = result(state, action, 'max')
-            response = minSearch(newState, alpha, beta, depth+1)[0]
+        for action in game.actions(state):
+            newState = game.result(state, action, 'max')
+            response = self.minSearch(newState, alpha, beta, depth+1)[0]
             del newState
             
             if response > utility:
@@ -74,9 +74,9 @@ class Model:
         utility = -float('inf')
         minAction = [0,0,0]
         
-        for action in actions(state):
-            newState = result(state, action, 'min')
-            response = maxSearch(newState, alpha, beta, depth+1)[0]
+        for action in game.actions(state):
+            newState = game.result(state, action, 'min')
+            response = self.maxSearch(newState, alpha, beta, depth+1)[0]
             
             if response < utility:
                 minAction = action
@@ -103,7 +103,7 @@ class Model:
     #    The optimal action is the one that puts the model in the best position,
     #    given its heuristic evaluation of the state.
     def alphaBetaSearch(self, state):
-        response = maxSearch(state, -float('inf'), float('inf'), 0)
+        response = self.maxSearch(state, -float('inf'), float('inf'), 0)
         
         return response[1]
     #end alphaBetaSearch

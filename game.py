@@ -130,7 +130,7 @@ class State:
     #    as a token for the player in the game's representation array.
     def play(self, x, y, z, player):
         if self.gameRepresentation[x,y,z] == 0:
-            self.gameRepresentation[x, y, z] = 1 if player.upper() == 'MAX' else -1
+            self.gameRepresentation[x, y, z] = player.value if isinstance(player, Token) else player #1 if player.upper() == 'MAX' else -1
             return True
         #end if
         
@@ -326,7 +326,7 @@ class Game:
     #    Instantiates the Game object, which includes a State and Model object.
     def __init__(self, maxDepth):
         self.gameState = State()
-        self.aiPlayer = Model(maxDepth)
+        self.aiPlayer = model.Model(maxDepth)
         
         self.turn = Turn.PLAYER
     #end __init__

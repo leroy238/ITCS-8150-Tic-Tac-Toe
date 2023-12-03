@@ -3,7 +3,7 @@ import numpy as np
 import game
 import model
 
-mode = 'debug' #other mode is 'run'
+mode = 'run' #other mode is 'debug'
 
 # stateTest()
 #    Input: None
@@ -136,7 +136,7 @@ def main():
                 continue
             #end if/elif/else
             
-            thisGame = Game(maxDepth)
+            thisGame = game.Game(maxDepth)
             thisGame.run()
         else:
             print('Invalid answer!')
