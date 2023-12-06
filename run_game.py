@@ -159,10 +159,32 @@ def ai_make_move():
         board_state[layer][row][col] = 2  # Mark the slot with an 'X'
 
 
+# Setup game configuration
+gameStart = input('Would you like to start the game? [Y/N]')
+        
+if gameStart.upper() == 'N':
+    print('Okay! Goodbye.')
+    exit()
+elif gameStart.upper() == 'Y':
+    difficulty = input('Difficulty level? [easy/difficult/insane]')
+    
+    maxDepth = 0
+    if difficulty.lower() == 'easy':
+        maxDepth = 2
+    elif difficulty.lower() == 'difficult':
+        maxDepth = 4
+    elif difficulty.lower() == 'insane':
+        maxDepth = 6
+    else:
+        print('Invalid difficulty!')
+        exit()    
+    thisGame = game.Game(maxDepth)
+else:
+    print('Invalid answer!')
+    exit()
+
 # Main game loop
 running = True
-thisGame = game.Game(2) #TODO: Put maxDepth here
-# thisGame.run()
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -185,7 +207,7 @@ while running:
                 else:
                     winner = 'AI'
                 if winner != '':
-                    print(winner + 'has won!')
+                    print(winner + ' has won!')
                     running = False
 
     # Draw the initial game state if the game is still running
