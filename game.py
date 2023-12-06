@@ -25,6 +25,13 @@ class State:
     def __init__(self):
         self.gameRepresentation = np.zeros(shape=(4,4,4), dtype=int)
     # end __init__
+
+    # isValidExtension(self, point, extension)
+    # Input: self (the object), point (the position on the board), extension (the change to be applied to the position on the board)
+    #
+    # Output: boolean (whether or not the extension results in a position that is still on the board) 
+    def isValidExtension(self, point: [int, int, int], extension: [int, int, int]):
+        return point[0] + extension[0] < 4 and point[1] + extension[1] < 4 and point[2] + extension[2] < 4
     
     # h(self)
     #    Input: self (the object)
@@ -66,7 +73,7 @@ class State:
             for y in range(4):
                 for z in range(4):
                     if x == 0 or y == 0 or z == 0:
-                        points.append(np.array[x,y,z])
+                        points.append(np.array([x,y,z]))
                     #end if
                 #end for
             #end for
@@ -104,10 +111,10 @@ class State:
                     
                     # We want to encourage points even if they are not directly
                     # in a line. No case for value is 0 is necessary.
-                    
-                    point[0] += direction[0]
-                    point[1] += direction[1]
-                    point[2] += direction[2]
+                    if self.isValidExtension(point, direction):
+                      point[0] += direction[0]
+                      point[1] += direction[1]
+                      point[2] += direction[2]
                 #end for
             #end for
         #end for
@@ -374,7 +381,7 @@ class Game:
             winner = 'AI'
         #end if/else
         
-        print(winner + 'has won!')
+        print(winner + ' has won!')
     #end run
 
 #end Game
