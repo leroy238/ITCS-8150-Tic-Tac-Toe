@@ -154,7 +154,7 @@ def ai_make_move():
     # If there are empty slots, choose one at random and mark it with an 'X'
     if empty_slots:
         currState = thisGame.gameState
-        layer, row, col = thisGame.aiPlayer.alphaBetaSearch(currState)#random.choice(empty_slots)
+        layer, row, col = thisGame.aiPlayer.alphaBetaSearch(currState)
         thisGame.gameState.play(layer, row, col, game.Token.AI)
         board_state[layer][row][col] = 2  # Mark the slot with an 'X'
 
@@ -202,13 +202,23 @@ while running:
                 
                 winTuple = thisGame.gameState.isWin()
                 winner = ''
-                if winTuple[1] == 1:
+                if winTuple[1] == -1: # Player is min player
                     winner = 'Player'
-                else:
+                elif winTuple[1] == 1: # AI is max player 
                     winner = 'AI'
+                elif winTuple[0]: # Tie is a win with no winner.
+                    winner = 'Tie'
+                #end if/elif
+                
                 if winner != '':
-                    print(winner + ' has won!')
+                    if winner != 'Tie':
+                        print(winner + ' has won!')
+                    else:
+                        print('It\'s a tie!')
+                    #end if/else
+                    
                     running = False
+                #end if
 
     # Draw the initial game state if the game is still running
     if running:

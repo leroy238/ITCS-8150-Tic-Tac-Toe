@@ -1,9 +1,10 @@
 import traceback
 import numpy as np
-import game
+from game import *
 import model
 
-mode = 'run' #other mode is 'debug'
+
+mode = 'debug' #other mode is 'run'
 
 # stateTest()
 #    Input: None
@@ -15,13 +16,13 @@ def stateTest():
             #Unit tests for State
         test_array = np.zeros(shape=(4,4,4), dtype=int)
         
-        test_state = game.State()
+        test_state = State()
         
         #Heuristic tests omitted since they do not yet exist.
         
-        assert(test_state.play(1,1,1,'max'))
-        assert(test_state.play(1,0,1,'min'))
-        assert(not test_state.play(1,1,1, 'max'))
+        assert(test_state.play(1,1,1,Token.AI))
+        assert(test_state.play(1,0,1,Token.PLAYER))
+        assert(not test_state.play(1,1,1, Token.AI))
         
         test_array[1,1,1] = 1
         test_array[1,0,1] = -1
@@ -44,58 +45,58 @@ def stateTest():
         copy_state = test_state.copy()
         assert(np.all(np.equal(copy_state.getState(), test_state.getState())))
         
-        assert(copy_state.play(2,1,3,'min'))
+        assert(copy_state.play(2,1,3,Token.PLAYER))
         assert(not np.all(np.equal(copy_state.getState(), test_state.getState())))
         
         del copy_state
         del test_state
         del test_array
         
-        test_state = game.State()
-        assert(test_state.play(0,0,0,'max'))
-        assert(test_state.play(1,1,1,'max'))
-        assert(test_state.play(2,2,2,'max'))
-        assert(test_state.play(3,3,3,'max'))
+        test_state = State()
+        assert(test_state.play(0,0,0,Token.AI))
+        assert(test_state.play(1,1,1,Token.AI))
+        assert(test_state.play(2,2,2,Token.AI))
+        assert(test_state.play(3,3,3,Token.AI))
         
         assert(test_state.isWin()[0] and test_state.isWin()[1] == 1)
         
         del test_state
         
-        test_state = game.State()
-        assert(test_state.play(0,1,0,'max'))
-        assert(test_state.play(0,1,1,'max'))
-        assert(test_state.play(0,1,2,'max'))
-        assert(test_state.play(0,1,3,'max'))
+        test_state = State()
+        assert(test_state.play(0,1,0,Token.AI))
+        assert(test_state.play(0,1,1,Token.AI))
+        assert(test_state.play(0,1,2,Token.AI))
+        assert(test_state.play(0,1,3,Token.AI))
         
         assert(test_state.isWin()[0] and test_state.isWin()[1] == 1)
         
         del test_state
         
-        test_state = game.State()
-        assert(test_state.play(1,0,0,'max'))
-        assert(test_state.play(1,1,0,'max'))
-        assert(test_state.play(1,2,0,'max'))
-        assert(test_state.play(1,3,0,'max'))
+        test_state = State()
+        assert(test_state.play(1,0,0,Token.AI))
+        assert(test_state.play(1,1,0,Token.AI))
+        assert(test_state.play(1,2,0,Token.AI))
+        assert(test_state.play(1,3,0,Token.AI))
         
         assert(test_state.isWin()[0] and test_state.isWin()[1] == 1)
         
         del test_state
         
-        test_state = game.State()
-        assert(test_state.play(0,1,0,'min'))
-        assert(test_state.play(1,1,0,'min'))
-        assert(test_state.play(2,1,0,'min'))
-        assert(test_state.play(3,1,0,'min'))
+        test_state = State()
+        assert(test_state.play(0,1,0,Token.PLAYER))
+        assert(test_state.play(1,1,0,Token.PLAYER))
+        assert(test_state.play(2,1,0,Token.PLAYER))
+        assert(test_state.play(3,1,0,Token.PLAYER))
         
         assert(test_state.isWin()[0] and test_state.isWin()[1] == -1)
         
         del test_state
         
-        test_state = game.State()
-        assert(test_state.play(0,1,0,'min'))
-        assert(test_state.play(1,1,0,'max'))
-        assert(test_state.play(2,1,0,'min'))
-        assert(test_state.play(3,1,0,'max'))
+        test_state = State()
+        assert(test_state.play(0,1,0,Token.PLAYER))
+        assert(test_state.play(1,1,0,Token.AI))
+        assert(test_state.play(2,1,0,Token.PLAYER))
+        assert(test_state.play(3,1,0,Token.AI))
         
         assert(not(test_state.isWin()[0]) and test_state.isWin()[1] == 0)
         
@@ -136,7 +137,7 @@ def main():
                 continue
             #end if/elif/else
             
-            thisGame = game.Game(maxDepth)
+            thisGame =  Game(maxDepth)
             thisGame.run()
         else:
             print('Invalid answer!')

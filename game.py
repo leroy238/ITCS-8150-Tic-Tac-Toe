@@ -210,8 +210,8 @@ class State:
         for y in range(3):
             for z in range(3):
                 token = self.gameRepresentation[0, y, z]
-                array = np.array([0,y,z])
-                if token != 0 and array not in potWins:
+                array = [0,y,z]
+                if token != 0 and ((array,token) not in potWins):
                     potWins.append((array,token))
                 #end if
             #end for
@@ -220,8 +220,8 @@ class State:
         for x in range(3):
             for z in range(3):
                 token = self.gameRepresentation[x, 0, z]
-                array = np.array([x,0,z])
-                if token != 0 and array not in potWins:
+                array = [x,0,z]
+                if token != 0 and ((array, token) not in potWins):
                     potWins.append((array,token))
                 #end if
             #end for
@@ -230,8 +230,8 @@ class State:
         for x in range(3):
             for y in range(3):
                 token = self.gameRepresentation[x, y, 0]
-                array = np.array([x,y,0])
-                if token != 0 and array not in potWins:
+                array = [x,y,0]
+                if token != 0 and ((array, token) not in potWins):
                     potWins.append((array,token))
                 #end if
             #end for
