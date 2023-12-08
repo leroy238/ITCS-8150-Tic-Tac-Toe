@@ -76,12 +76,28 @@ class State:
         for x in range(4):
             for y in range(4):
                 for z in range(4):
-                    if x == 0 or y == 0 or z == 0:
+                    if self.gameRepresentation[x,y,z] != 0:
                         points.append(np.array([x,y,z]))
                     #end if
                 #end for
             #end for
         #end for
+        
+        startPoints = {(0,0,0)}
+        for point in points:
+            x = point[0]
+            y = point[1]
+            z = point[2]
+            
+            startPoints.add((0,y,z))
+            startPoints.add((x,0,z))
+            startPoints.add((x,y,0))
+            startPoints.add((0,0,z))
+            startPoints.add((0,y,0))
+            startPoints.add((x,0,0))
+        #end for
+        # Now only contains valid starting positions
+        points = [np.array([point[0], point[1], point[2]]) for point in startPoints]
         
         score = 0
         
@@ -111,6 +127,7 @@ class State:
                         else:
                             # Line is blocked. Should not encourage moves like this.
                             count = 0
+                            continue
                         #end if/else
                     #end if
                     
