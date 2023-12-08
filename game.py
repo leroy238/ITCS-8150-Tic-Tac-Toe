@@ -89,7 +89,7 @@ class State:
                 tempScore = 0
                 for num in range(4):
                     value = self.gameRepresentation[point[0], point[1], point[2]]
-                    # No point 
+                    # Point has a value in it.
                     if value != 0:
                         if prevVal == 0:
                             prevVal = value
@@ -115,6 +115,7 @@ class State:
                       point[0] += direction[0]
                       point[1] += direction[1]
                       point[2] += direction[2]
+                    #end if
                 #end for
             #end for
         #end for
