@@ -52,6 +52,7 @@ class Model:
             alpha = max(alpha, utility)
         #end for
         
+        print(maxAction)
         return (utility, maxAction)
     #end maxSearch
     

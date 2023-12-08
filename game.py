@@ -207,8 +207,8 @@ class State:
         # Store all potential wins, see if they work by expanding in each direction.
         
         potWins = []
-        for y in range(3):
-            for z in range(3):
+        for y in range(4):
+            for z in range(4):
                 token = self.gameRepresentation[0, y, z]
                 array = [0,y,z]
                 if token != 0 and ((array,token) not in potWins):
@@ -217,8 +217,8 @@ class State:
             #end for
         #end for
         
-        for x in range(3):
-            for z in range(3):
+        for x in range(4):
+            for z in range(4):
                 token = self.gameRepresentation[x, 0, z]
                 array = [x,0,z]
                 if token != 0 and ((array, token) not in potWins):
@@ -227,8 +227,8 @@ class State:
             #end for
         #end for
         
-        for x in range(3):
-            for y in range(3):
+        for x in range(4):
+            for y in range(4):
                 token = self.gameRepresentation[x, y, 0]
                 array = [x,y,0]
                 if token != 0 and ((array, token) not in potWins):

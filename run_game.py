@@ -3,7 +3,10 @@ import sys
 import random
 import game
 
-# InitializINg game
+# Current game state
+thisGame = None
+
+# Initializing game
 pygame.init()
 
 # Constants for te GUI
@@ -24,12 +27,6 @@ CROSS_COLOR = (0, 0, 255)  # Blue 'X' for the AI player
 # Setup the display
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("3D Tic Tac Toe")
-
-# Initialize the board state with 0 (empty), 1 (human player's circle), 2 (AI's 'X')
-board_state = [
-    [[0 for _ in range(GRID_COLS)] for _ in range(GRID_ROWS)]
-    for _ in range(GRID_LAYERS)
-]
 
 
 # Function to draw all four layers
@@ -79,6 +76,8 @@ def draw_layers():
 
 # Function to draw circles and 'X's based on the board state
 def draw_marks():
+    board_state = thisGame.gameState.getState()
+    
     # Iterate over each layer, row, and column to draw marks
     for layer in range(GRID_LAYERS):
         # Calculate the origin for the marks on the current layer
@@ -96,12 +95,12 @@ def draw_marks():
                 )
                 center_y = origin_y + row * GRID_SIZE + GRID_SIZE // 2
                 # If the slot contains the human player's mark, draw a red circle
-                if board_state[layer][row][col] == 1:
+                if board_state[layer][row][col] == game.Token.PLAYER.value:
                     pygame.draw.circle(
                         screen, CIRCLE_COLOR, (center_x, center_y), CIRCLE_RADIUS
                     )
                 # If the slot contains the AI's mark, draw a blue 'X'
-                elif board_state[layer][row][col] == 2:
+                elif board_state[layer][row][col] == game.Token.AI.value:
                     # Draw one diagonal line of the 'X'
                     pygame.draw.line(
                         screen,
@@ -122,6 +121,8 @@ def draw_marks():
 
 # Function to handle mouse clicks when  the human player click or scooll mouse3
 def handle_mouse_click(pos):
+    board_state = thisGame.gameState.getState()
+
     # Iterate over all slots to check for the clicked position
     for layer in range(GRID_LAYERS):
         origin_x = WIDTH // 2 - GRID_SIZE * 2 - layer * PERSPECTIVE_OFFSET_X
@@ -134,8 +135,6 @@ def handle_mouse_click(pos):
                 slot_rect = pygame.Rect(rect_x, rect_y, GRID_SIZE, GRID_SIZE)
                 # If the click is within the slot and it's empty, mark it with a circle
                 if slot_rect.collidepoint(pos) and board_state[layer][row][col] == 0:
-                    
-                    board_state[layer][row][col] = 1
                     thisGame.gameState.play(layer, row, col, game.Token.PLAYER)
                     return True  # A circle placed
     return False  # No circle placed
@@ -143,90 +142,112 @@ def handle_mouse_click(pos):
 
 # Function for the AI to make a move
 def ai_make_move():
-    # createtr a list of all empty slots l-layer r- row  c- column
-    empty_slots = [
-        (l, r, c)
-        for l in range(GRID_LAYERS)
-        for r in range(GRID_ROWS)
-        for c in range(GRID_COLS)
-        if board_state[l][r][c] == 0
-    ]
-    # If there are empty slots, choose one at random and mark it with an 'X'
-    if empty_slots:
-        currState = thisGame.gameState
-        layer, row, col = thisGame.aiPlayer.alphaBetaSearch(currState)
-        thisGame.gameState.play(layer, row, col, game.Token.AI)
-        board_state[layer][row][col] = 2  # Mark the slot with an 'X'
+    currState = thisGame.gameState
+    layer, row, col = thisGame.aiPlayer.alphaBetaSearch(currState)
+    thisGame.gameState.play(layer, row, col, game.Token.AI)
+#end ai_make_move
+   
+def winFound():
+    winTuple = thisGame.gameState.isWin()
+    winner = ''
+    if winTuple[1] == -1: # Player is min player
+        winner = 'Player'
+    elif winTuple[1] == 1: # AI is max player 
+        winner = 'AI'
+    elif winTuple[0]: # Tie is a win with no winner.
+        winner = 'Tie'
+    #end if/elif
+    
+    if winner != '':
+        if winner != 'Tie':
+            print(winner + ' has won!')
+        else:
+            print('It\'s a tie!')
+        #end if/else
+    #end if
+    
+    return winTuple[0]
+#end winFound
 
 
 # Setup game configuration
-gameStart = input('Would you like to start the game? [Y/N]')
-        
-if gameStart.upper() == 'N':
-    print('Okay! Goodbye.')
-    exit()
-elif gameStart.upper() == 'Y':
-    difficulty = input('Difficulty level? [easy/difficult/insane]')
+def gameConfig():
+    global thisGame
     
-    maxDepth = 0
-    if difficulty.lower() == 'easy':
-        maxDepth = 2
-    elif difficulty.lower() == 'difficult':
-        maxDepth = 4
-    elif difficulty.lower() == 'insane':
-        maxDepth = 6
-    else:
-        print('Invalid difficulty!')
-        exit()    
-    thisGame = game.Game(maxDepth)
-else:
-    print('Invalid answer!')
-    exit()
+    while True:
+        
+    
+        gameStart = input('Would you like to start the game? [Y/N]')
+        if gameStart.upper() == 'N':
+            print('Okay! Goodbye.')
+            pygame.quit()
+            break
+        elif gameStart.upper() == 'Y':
+            difficulty = input('Difficulty level? [easy/difficult/insane]')
+            
+            maxDepth = 0
+            if difficulty.lower() == 'easy':
+                maxDepth = 2
+            elif difficulty.lower() == 'difficult':
+                maxDepth = 4
+            elif difficulty.lower() == 'insane':
+                maxDepth = 6
+            else:
+                print('Invalid difficulty!')  
+            #end if/elif/else
+            
+            thisGame = game.Game(maxDepth)
+        else:
+            print('Invalid answer!')
+        #end if/elif/else
+        
+        gameLoop()
+    #end while
+#end gameConfig
 
 # Main game loop
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            # If the player clicks and a circle is placed
-            player_moved = handle_mouse_click(event.pos)
-            if player_moved:
-                ai_make_move()  # AI makes THE move after the player
-                # Redraw the screen with the new marks
-                screen.fill(BG_COLOR)
-                draw_layers()
-                draw_marks()
-                pygame.display.flip()
+def gameLoop(): 
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # If the player clicks and a circle is placed
+                player_moved = handle_mouse_click(event.pos)
+                if player_moved:
+                    # Did player win?
+                    if winFound():
+                        running = False
+                        screen.fill(BG_COLOR)
+                        draw_layers()
+                        draw_marks()
+                        pygame.display.flip()
+                        break
+                    #end if
                 
-                winTuple = thisGame.gameState.isWin()
-                winner = ''
-                if winTuple[1] == -1: # Player is min player
-                    winner = 'Player'
-                elif winTuple[1] == 1: # AI is max player 
-                    winner = 'AI'
-                elif winTuple[0]: # Tie is a win with no winner.
-                    winner = 'Tie'
-                #end if/elif
-                
-                if winner != '':
-                    if winner != 'Tie':
-                        print(winner + ' has won!')
-                    else:
-                        print('It\'s a tie!')
-                    #end if/else
+                    ai_make_move()  # AI makes THE move after the player
+                    # Redraw the screen with the new marks
+                    screen.fill(BG_COLOR)
+                    draw_layers()
+                    draw_marks()
+                    pygame.display.flip()
                     
-                    running = False
-                #end if
+                    if winFound():
+                        running = False
+                        break
+                    #end if
 
-    # Draw the initial game state if the game is still running
-    if running:
-        screen.fill(BG_COLOR)
-        draw_layers()
-        draw_marks()
-        pygame.display.flip()
+        # Draw the initial game state if the game is still running
+        if running:
+            screen.fill(BG_COLOR)
+            draw_layers()
+            draw_marks()
+            pygame.display.flip()
+        #end if
+    #end while
+#end gameLoop
 
-# Quit the game when the main loop ends
-pygame.quit()
+gameConfig()
+
 sys.exit()

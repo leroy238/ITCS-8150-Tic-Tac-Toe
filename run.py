@@ -13,95 +13,109 @@ mode = 'debug' #other mode is 'run'
 #
 #    Throughly tests the functions of State.
 def stateTest():
-            #Unit tests for State
-        test_array = np.zeros(shape=(4,4,4), dtype=int)
-        
-        test_state = State()
-        
-        #Heuristic tests omitted since they do not yet exist.
-        
-        assert(test_state.play(1,1,1,Token.AI))
-        assert(test_state.play(1,0,1,Token.PLAYER))
-        assert(not test_state.play(1,1,1, Token.AI))
-        
-        test_array[1,1,1] = 1
-        test_array[1,0,1] = -1
-        
-        assert(np.all(np.equal(test_state.getState(), test_array)))
-        
-        test_array[2,2,2] = 1
-        
-        test_state.setState(test_array)
-        assert(np.all(np.equal(test_state.getState(), test_array)))
-        
-        try:
-            test_state.setState(np.ndarray(shape=(3,3,3), dtype=int))
-            assert(False)
-        except TypeError:
-            #Exception here was expected.
-            assert(True)
-        #end try/except
-        
-        copy_state = test_state.copy()
-        assert(np.all(np.equal(copy_state.getState(), test_state.getState())))
-        
-        assert(copy_state.play(2,1,3,Token.PLAYER))
-        assert(not np.all(np.equal(copy_state.getState(), test_state.getState())))
-        
-        del copy_state
-        del test_state
-        del test_array
-        
-        test_state = State()
-        assert(test_state.play(0,0,0,Token.AI))
-        assert(test_state.play(1,1,1,Token.AI))
-        assert(test_state.play(2,2,2,Token.AI))
-        assert(test_state.play(3,3,3,Token.AI))
-        
-        assert(test_state.isWin()[0] and test_state.isWin()[1] == 1)
-        
-        del test_state
-        
-        test_state = State()
-        assert(test_state.play(0,1,0,Token.AI))
-        assert(test_state.play(0,1,1,Token.AI))
-        assert(test_state.play(0,1,2,Token.AI))
-        assert(test_state.play(0,1,3,Token.AI))
-        
-        assert(test_state.isWin()[0] and test_state.isWin()[1] == 1)
-        
-        del test_state
-        
-        test_state = State()
-        assert(test_state.play(1,0,0,Token.AI))
-        assert(test_state.play(1,1,0,Token.AI))
-        assert(test_state.play(1,2,0,Token.AI))
-        assert(test_state.play(1,3,0,Token.AI))
-        
-        assert(test_state.isWin()[0] and test_state.isWin()[1] == 1)
-        
-        del test_state
-        
-        test_state = State()
-        assert(test_state.play(0,1,0,Token.PLAYER))
-        assert(test_state.play(1,1,0,Token.PLAYER))
-        assert(test_state.play(2,1,0,Token.PLAYER))
-        assert(test_state.play(3,1,0,Token.PLAYER))
-        
-        assert(test_state.isWin()[0] and test_state.isWin()[1] == -1)
-        
-        del test_state
-        
-        test_state = State()
-        assert(test_state.play(0,1,0,Token.PLAYER))
-        assert(test_state.play(1,1,0,Token.AI))
-        assert(test_state.play(2,1,0,Token.PLAYER))
-        assert(test_state.play(3,1,0,Token.AI))
-        
-        assert(not(test_state.isWin()[0]) and test_state.isWin()[1] == 0)
-        
-        del test_state
-
+    #Unit tests for State
+    test_array = np.zeros(shape=(4,4,4), dtype=int)
+    
+    test_state = State()
+    
+    #Heuristic tests omitted since they do not yet exist.
+    
+    assert(test_state.play(1,1,1,Token.AI))
+    assert(test_state.play(1,0,1,Token.PLAYER))
+    assert(not test_state.play(1,1,1, Token.AI))
+    
+    test_array[1,1,1] = 1
+    test_array[1,0,1] = -1
+    
+    assert(np.all(np.equal(test_state.getState(), test_array)))
+    
+    test_array[2,2,2] = 1
+    
+    test_state.setState(test_array)
+    assert(np.all(np.equal(test_state.getState(), test_array)))
+    
+    try:
+        test_state.setState(np.ndarray(shape=(3,3,3), dtype=int))
+        assert(False)
+    except TypeError:
+        #Exception here was expected.
+        assert(True)
+    #end try/except
+    
+    copy_state = test_state.copy()
+    assert(np.all(np.equal(copy_state.getState(), test_state.getState())))
+    
+    assert(copy_state.play(2,1,3,Token.PLAYER))
+    assert(not np.all(np.equal(copy_state.getState(), test_state.getState())))
+    
+    del copy_state
+    del test_state
+    del test_array
+    
+    test_state = State()
+    assert(test_state.play(0,0,0,Token.AI))
+    assert(test_state.play(1,1,1,Token.AI))
+    assert(test_state.play(2,2,2,Token.AI))
+    assert(test_state.play(3,3,3,Token.AI))
+    
+    assert(test_state.isWin()[0] and test_state.isWin()[1] == 1)
+    
+    del test_state
+    
+    test_state = State()
+    assert(test_state.play(0,1,0,Token.AI))
+    assert(test_state.play(0,1,1,Token.AI))
+    assert(test_state.play(0,1,2,Token.AI))
+    assert(test_state.play(0,1,3,Token.AI))
+    
+    assert(test_state.isWin()[0] and test_state.isWin()[1] == 1)
+    
+    del test_state
+    
+    test_state = State()
+    assert(test_state.play(1,0,0,Token.AI))
+    assert(test_state.play(1,1,0,Token.AI))
+    assert(test_state.play(1,2,0,Token.AI))
+    assert(test_state.play(1,3,0,Token.AI))
+    
+    assert(test_state.isWin()[0] and test_state.isWin()[1] == 1)
+    
+    del test_state
+    
+    test_state = State()
+    assert(test_state.play(0,1,0,Token.PLAYER))
+    assert(test_state.play(1,1,0,Token.PLAYER))
+    assert(test_state.play(2,1,0,Token.PLAYER))
+    assert(test_state.play(3,1,0,Token.PLAYER))
+    
+    assert(test_state.isWin()[0] and test_state.isWin()[1] == -1)
+    
+    del test_state
+    
+    test_state = State()
+    assert(test_state.play(0,1,0,Token.PLAYER))
+    assert(test_state.play(1,1,0,Token.AI))
+    assert(test_state.play(2,1,0,Token.PLAYER))
+    assert(test_state.play(3,1,0,Token.AI))
+    
+    print(test_state.h())
+    
+    assert(not(test_state.isWin()[0]) and test_state.isWin()[1] == 0)
+    
+    del test_state
+    
+    test_state = State()
+    test_values = np.zeros((4,4,4))
+    test_values[3,3,3] = -1
+    test_values[2,3,3] = -1
+    test_values[1,3,3] = -1
+    test_values[0,3,3] = -1
+    
+    test_state.setState(test_values)
+    assert(test_state.isWin()[0] and test_state.isWin()[1] == -1)
+    
+    print(test_state.h())
+#end stateTest
 
 def debug():
     try:
