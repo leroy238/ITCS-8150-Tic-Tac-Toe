@@ -27,17 +27,18 @@ class Model:
     #    List (the list of actions to take after this state to get the best value)
     #
     #    Implements the search of the maximizing player in alpha-beta pruning.
-    def maxSearch(self, state, alpha, beta, depth):
+    def maxSearch(self, state, alpha, beta, depth, possibleActions = []):
         if self.maxLayers == depth or state.isWin()[0]:
             return (state.h(), [])
         #end if
         
         utility = -float('inf')
         maxAction = [0,0,0]
-        
-        for action in game.actions(state):
+        initialActions = possibleActions
+        for i, action in enumerate(possibleActions):#game.actions(state):
             newState = game.result(state, action, 'max')
-            response = self.minSearch(newState, alpha, beta, depth+1)[0]
+            possibleActions.pop(i)
+            response = self.minSearch(newState, alpha, beta, depth+1, possibleActions)[0]
             del newState
             
             if response > utility:
@@ -50,6 +51,7 @@ class Model:
             #end if
             
             alpha = max(alpha, utility)
+            possibleActions = initialActions
         #end for
         
         return (utility, maxAction)
@@ -66,17 +68,18 @@ class Model:
     #    List (the list of actions to take after this state to get the best value)
     #
     #    Implements the search of the minimizing player in alpha-beta pruning.
-    def minSearch(self, state, alpha, beta, depth):
+    def minSearch(self, state, alpha, beta, depth, possibleActions = []):
         if self.maxLayers == depth or state.isWin()[0]:
             return (state.h(), [])
         #end if
         
         utility = float('inf')
         minAction = [0,0,0]
-        
-        for action in game.actions(state):
+        initialActions = possibleActions
+        for i, action in enumerate(possibleActions): #game.actions(state)
             newState = game.result(state, action, 'min')
-            response = self.maxSearch(newState, alpha, beta, depth+1)[0]
+            possibleActions.pop(i)
+            response = self.maxSearch(newState, alpha, beta, depth+1, possibleActions)[0]
             
             if response < utility:
                 minAction = action
@@ -88,6 +91,7 @@ class Model:
             #end if
             
             beta = min(beta, utility)
+            possibleActions = initialActions
         #end for
         
         return (utility, minAction)
@@ -103,7 +107,8 @@ class Model:
     #    The optimal action is the one that puts the model in the best position,
     #    given its heuristic evaluation of the state.
     def alphaBetaSearch(self, state):
-        response = self.maxSearch(state, -float('inf'), float('inf'), 0)
+        actions = game.actions(state)
+        response = self.maxSearch(state, -float('inf'), float('inf'), 0, actions)
         
         return response[1]
     #end alphaBetaSearch
