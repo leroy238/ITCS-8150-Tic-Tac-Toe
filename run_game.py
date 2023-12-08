@@ -226,7 +226,7 @@ def gameLoop():
                         break
                     #end if
                 
-                    ai_make_move()  # AI makes THE move after the player
+                    ai_make_move()  # AI makes a move after the player
                     # Redraw the screen with the new marks
                     screen.fill(BG_COLOR)
                     draw_layers()

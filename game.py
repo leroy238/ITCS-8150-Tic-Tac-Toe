@@ -31,9 +31,9 @@ class State:
     #
     # Output: boolean (whether or not the extension results in a position that is still on the board) 
     def isValidExtension(self, point: [int, int, int], extension: [int, int, int]):
-        xExtend = point[0] + extension[0]
-        yExtend = point[1] + extension[1]
-        zExtend = point[2] + extension[2]
+        xExtend = point[0] + 3 * extension[0]
+        yExtend = point[1] + 3 * extension[1]
+        zExtend = point[2] + 3 * extension[2]
         return xExtend < 4 and xExtend > -1 and yExtend < 4 and yExtend > -1 and zExtend < 4 and zExtend > -1
     #end isValidExtension
     
@@ -89,12 +89,12 @@ class State:
         for point in points:
             for direction in extensions:
                 if not self.isValidExtension(point, direction):
-                    break
+                    continue
                 #end if
                 prevVal = 0
                 count = 0
                 tempScore = 0
-                for num in range(4):
+                for num in range(3):
                     value = self.gameRepresentation[point[0], point[1], point[2]]
                     # Point has a value in it.
                     if value != 0:

@@ -67,11 +67,11 @@ class Model:
     #
     #    Implements the search of the minimizing player in alpha-beta pruning.
     def minSearch(self, state, alpha, beta, depth):
-        if self.maxLayers == depth or state.isWin():
+        if self.maxLayers == depth or state.isWin()[0]:
             return (state.h(), [])
         #end if
         
-        utility = -float('inf')
+        utility = float('inf')
         minAction = [0,0,0]
         
         for action in game.actions(state):
