@@ -8,4 +8,4 @@ This is a 3D Tic Tac Toe game created as a final project for the course ITCS-815
 
 # Contributors
 
-This project was worked on by Bianca Johnson, Justin Smith, Sampada Sakpal, and Zhi Wang. Contributors are in alphabetical order.
+This project was worked on by Bianca Jhonson, Justin Smith, Sampada Sakpal, and Zhi Wang. Contributors are in alphabetical order.
