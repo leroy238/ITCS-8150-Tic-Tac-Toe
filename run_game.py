@@ -10,7 +10,7 @@ thisGame = None
 pygame.init()
 
 # Constants for te GUI
-WIDTH, HEIGHT = 1004, 1004  # Square window size
+WIDTH, HEIGHT = 900,900 #1004, 1004  # Square window size
 GRID_ROWS, GRID_COLS, GRID_LAYERS = 4, 4, 4  # 4x4 grid on 4 layers
 GRID_SIZE = 50  # Size of each grid cell
 PERSPECTIVE_OFFSET_X = 25  # Horizontal offset for 3D effect

@@ -98,8 +98,6 @@ def stateTest():
     assert(test_state.play(2,1,0,Token.PLAYER))
     assert(test_state.play(3,1,0,Token.AI))
     
-    print(test_state.h())
-    
     assert(not(test_state.isWin()[0]) and test_state.isWin()[1] == 0)
     
     del test_state
@@ -113,8 +111,6 @@ def stateTest():
     
     test_state.setState(test_values)
     assert(test_state.isWin()[0] and test_state.isWin()[1] == -1)
-    
-    print(test_state.h())
 #end stateTest
 
 def debug():

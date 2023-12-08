@@ -31,7 +31,11 @@ class State:
     #
     # Output: boolean (whether or not the extension results in a position that is still on the board) 
     def isValidExtension(self, point: [int, int, int], extension: [int, int, int]):
-        return point[0] + extension[0] < 4 and point[1] + extension[1] < 4 and point[2] + extension[2] < 4
+        xExtend = point[0] + extension[0]
+        yExtend = point[1] + extension[1]
+        zExtend = point[2] + extension[2]
+        return xExtend < 4 and xExtend > -1 and yExtend < 4 and yExtend > -1 and zExtend < 4 and zExtend > -1
+    #end isValidExtension
     
     # h(self)
     #    Input: self (the object)
@@ -56,9 +60,9 @@ class State:
         
         # Create extension directions.
         extensions = []
-        for x in range(2):
-            for y in range(2):
-                for z in range(2):
+        for x in range(-1, 2):
+            for y in range(-1, 2):
+                for z in range(-1, 2):
                     # Extension [0,0,0] is invalid.
                     if x != 0 or y != 0 or z != 0:
                         extensions.append(np.array([x,y,z]))
@@ -84,6 +88,9 @@ class State:
         # Extend each point in each direction.
         for point in points:
             for direction in extensions:
+                if not self.isValidExtension(point, direction):
+                    break
+                #end if
                 prevVal = 0
                 count = 0
                 tempScore = 0
@@ -111,11 +118,11 @@ class State:
                     
                     # We want to encourage points even if they are not directly
                     # in a line. No case for value is 0 is necessary.
-                    if self.isValidExtension(point, direction):
-                      point[0] += direction[0]
-                      point[1] += direction[1]
-                      point[2] += direction[2]
-                    #end if
+                    
+                    point[0] += direction[0]
+                    point[1] += direction[1]
+                    point[2] += direction[2]
+                    
                 #end for
             #end for
         #end for
@@ -253,9 +260,9 @@ class State:
         
         # Create extension directions.
         extensions = []
-        for x in range(2):
-            for y in range(2):
-                for z in range(2):
+        for x in range(-1, 2):
+            for y in range(-1, 2):
+                for z in range(-1, 2):
                     # Extension [0,0,0] is invalid.
                     if x != 0 or y != 0 or z != 0:
                         extensions.append(np.array([x,y,z]))
@@ -269,9 +276,9 @@ class State:
             for direction in extensions:
                 point = potWin[0]
                 # Determines plausibility of a direction.
-                xUnfeas = point[0] > 0 and direction[0] > 0 
-                yUnfeas = point[1] > 0 and direction[1] > 0
-                zUnfeas = point[2] > 0 and direction[2] > 0
+                xUnfeas = (point[0] > 0 and direction[0] > 0) or (point[0] < 3 and direction[0] < 0)
+                yUnfeas = (point[1] > 0 and direction[1] > 0) or (point[1] < 3 and direction[1] < 0)
+                zUnfeas = (point[2] > 0 and direction[2] > 0) or (point[2] < 3 and direction[2] < 0)
                 if not(xUnfeas or yUnfeas or zUnfeas):
                     val = potWin[1]
                     
