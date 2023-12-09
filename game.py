@@ -14,6 +14,7 @@ class Token(Enum):
 class State:
 
     gameRepresentation = None
+    played = None
     
     # __init__(self)
     #    Input: self (the object being instantiated)
@@ -163,6 +164,7 @@ class State:
     def play(self, x, y, z, player):
         if self.gameRepresentation[x,y,z] == 0:
             self.gameRepresentation[x, y, z] = player.value if isinstance(player, Token) else player #1 if player.upper() == 'MAX' else -1
+            played = np.array([x,y,z]) # Store last played move.
             return True
         #end if
         
@@ -340,6 +342,15 @@ class State:
         return (True, 0)
     #end isWin
     
+    # getLastPlayed(self)
+    #    Input: self (the object)
+    #    
+    #    Output: Numpy array of the last played move.
+    #
+    #    Retrieves the last played move from the state.
+    def getLastPlayed(self):
+        return self.played
+    #end getLastPlayed    
 #end State
 
 # This class holds all the information about the current Game being played.
