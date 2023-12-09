@@ -10,7 +10,7 @@ thisGame = None
 pygame.init()
 
 # Constants for te GUI
-WIDTH, HEIGHT = 900,900 #1004, 1004  # Square window size
+WIDTH, HEIGHT = 900, 900  # 1004, 1004  # Square window size
 GRID_ROWS, GRID_COLS, GRID_LAYERS = 4, 4, 4  # 4x4 grid on 4 layers
 GRID_SIZE = 50  # Size of each grid cell
 PERSPECTIVE_OFFSET_X = 25  # Horizontal offset for 3D effect
@@ -18,15 +18,77 @@ PERSPECTIVE_OFFSET_Y = GRID_SIZE // 2  # Vertical offset for 3D effect
 CIRCLE_RADIUS = int(GRID_SIZE // 5)
 CROSS_SIZE = CIRCLE_RADIUS  # Size of the 'X' is the same as the circle
 
+#### Start of Constants for Level Selector Button ####
+
+# Difficulty levels and their corresponding depths
+DIFFICULTY_LEVELS = {"easy": 2, "difficult": 4, "insane": 6}
+
 # RGB Colors for the application
 BG_COLOR = (0, 0, 0)  # Black background
 LINE_COLOR = (0, 255, 0)  # Green grid
 CIRCLE_COLOR = (255, 0, 0)  # Red circles for human player
 CROSS_COLOR = (0, 0, 255)  # Blue 'X' for the AI player
 
+# Colors for buttons
+BUTTON_COLOR = (100, 100, 100)
+BUTTON_HOVER_COLOR = (150, 150, 150)
+TEXT_COLOR = (255, 255, 255)
+
+# Font for button text
+pygame.font.init()
+FONT = pygame.font.SysFont("Arial", 24)
+#### End of Constants for Level Selector Button ####
+
+
 # Setup the display
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("3D Tic Tac Toe")
+
+
+# Function to draw difficulty buttons
+def draw_buttons():
+    buttons = {}  # Dictionary to hold button
+    # Iterate over difficulty levels
+    for index, (level, depth) in enumerate(DIFFICULTY_LEVELS.items()):
+        # Set the x, y, width, and height for the button
+        button_x = WIDTH // 4  # Position the button horizontally centered
+        button_y = HEIGHT // 3 + (
+            index * 50
+        )  # Position the button vertically based on its index
+        button_w = WIDTH // 2  # Width of the button
+        button_h = 40  # Height of the button
+
+        # Create a rectangle for the button
+        button_rect = pygame.Rect(button_x, button_y, button_w, button_h)
+        # Draw the rectangle on the screen with the default button color
+        pygame.draw.rect(screen, BUTTON_COLOR, button_rect)
+        # Get poistion
+        mouse_pos = pygame.mouse.get_pos()
+        # Change the button color if the mouse hovering over it
+        if button_rect.collidepoint(mouse_pos):
+            pygame.draw.rect(screen, BUTTON_HOVER_COLOR, button_rect)
+
+        # Render the text for the button with the difficulty level and depth
+        text_surface = FONT.render(
+            f"{level.capitalize()} (Depth {depth})", True, TEXT_COLOR
+        )
+        # draw the text on the button
+        screen.blit(text_surface, (button_x + 10, button_y + 5))
+
+        # Store the button's rectangle in the buttons dictionary for click detection
+        buttons[level] = button_rect
+
+    return buttons
+
+
+# Function to check for button clicks
+def check_button_clicks(pos, buttons):
+    # Iterate over the buttons and their rectangles
+    for level, rect in buttons.items():
+        # Check if the provided position (from a mouse click) is within the rectangle of a button
+        if rect.collidepoint(pos):
+            return level  # Return the difficulty level of the clicked button
+    return None  # Return None if no button was clicked
 
 
 # Function to draw all four layers
@@ -77,7 +139,7 @@ def draw_layers():
 # Function to draw circles and 'X's based on the board state
 def draw_marks():
     board_state = thisGame.gameState.getState()
-    
+
     # Iterate over each layer, row, and column to draw marks
     for layer in range(GRID_LAYERS):
         # Calculate the origin for the marks on the current layer
@@ -145,74 +207,93 @@ def ai_make_move():
     currState = thisGame.gameState
     layer, row, col = thisGame.aiPlayer.alphaBetaSearch(currState)
     thisGame.gameState.play(layer, row, col, game.Token.AI)
-#end ai_make_move
-   
+
+
+# end ai_make_move
+
+
 def winFound():
     winTuple = thisGame.gameState.isWin()
-    winner = ''
-    if winTuple[1] == -1: # Player is min player
-        winner = 'Player'
-    elif winTuple[1] == 1: # AI is max player 
-        winner = 'AI'
-    elif winTuple[0]: # Tie is a win with no winner.
-        winner = 'Tie'
-    #end if/elif
-    
-    if winner != '':
-        if winner != 'Tie':
-            print(winner + ' has won!')
+    winner = ""
+    if winTuple[1] == -1:  # Player is min player
+        winner = "Player"
+    elif winTuple[1] == 1:  # AI is max player
+        winner = "AI"
+    elif winTuple[0]:  # Tie is a win with no winner.
+        winner = "Tie"
+    # end if/elif
+
+    if winner != "":
+        if winner != "Tie":
+            print(winner + " has won!")
         else:
-            print('It\'s a tie!')
-        #end if/else
-    #end if
-    
+            print("It's a tie!")
+        # end if/else
+    # end if
+
     return winTuple[0]
-#end winFound
+
+
+# end winFound
 
 
 # Setup game configuration
 def gameConfig():
     global thisGame
-    
+
     while True:
-        
-    
-        gameStart = input('Would you like to start the game? [Y/N]')
-        if gameStart.upper() == 'N':
-            print('Okay! Goodbye.')
+        gameStart = input("Would you like to start the game? [Y/N]")
+        if gameStart.upper() == "N":
+            print("Okay! Goodbye.")
             pygame.quit()
             break
-        elif gameStart.upper() == 'Y':
-            difficulty = input('Difficulty level? [easy/difficult/insane]')
-            
+        elif gameStart.upper() == "Y":
+            difficulty = input("Difficulty level? [easy/difficult/insane]")
+
             maxDepth = 0
-            if difficulty.lower() == 'easy':
+            if difficulty.lower() == "easy":
                 maxDepth = 2
-            elif difficulty.lower() == 'difficult':
+            elif difficulty.lower() == "difficult":
                 maxDepth = 4
-            elif difficulty.lower() == 'insane':
+            elif difficulty.lower() == "insane":
                 maxDepth = 6
             else:
-                print('Invalid difficulty!')  
-            #end if/elif/else
-            
+                print("Invalid difficulty!")
+            # end if/elif/else
+
             thisGame = game.Game(maxDepth)
         else:
-            print('Invalid answer!')
-        #end if/elif/else
-        
+            print("Invalid answer!")
+        # end if/elif/else
+
         gameLoop()
-    #end while
-#end gameConfig
+    # end while
+
+
+# end gameConfig
+
 
 # Main game loop
-def gameLoop(): 
+def gameLoop():
     running = True
+    waiting_for_difficulty = True  # To wait for difficulty selection
+    buttons = None  # To store buttons for difficulty selection
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
+
+            if event.type == pygame.MOUSEBUTTONDOWN and waiting_for_difficulty:
+                # Check if a difficulty button was clicked
+                level = check_button_clicks(event.pos, buttons)
+                if level:
+                    maxDepth = DIFFICULTY_LEVELS[level]
+                    thisGame = game.Game(maxDepth)
+                    waiting_for_difficulty = (
+                        False  # Difficulty selected, start the game
+                    )
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 # If the player clicks and a circle is placed
                 player_moved = handle_mouse_click(event.pos)
                 if player_moved:
@@ -224,30 +305,36 @@ def gameLoop():
                         draw_marks()
                         pygame.display.flip()
                         break
-                    #end if
-                
+                    # end if
+
                     ai_make_move()  # AI makes a move after the player
                     # Redraw the screen with the new marks
                     screen.fill(BG_COLOR)
                     draw_layers()
                     draw_marks()
                     pygame.display.flip()
-                    
+
                     if winFound():
                         running = False
                         break
-                    #end if
+                    # end if
 
         # Draw the initial game state if the game is still running
         if running:
             screen.fill(BG_COLOR)
-            draw_layers()
-            draw_marks()
+            if waiting_for_difficulty:
+                # Draw buttons if waiting for difficulty selection
+                buttons = draw_buttons()
+            else:
+                # Draw the game if the difficulty has been selected
+                draw_layers()
+                draw_marks()
             pygame.display.flip()
-        #end if
-    #end while
-#end gameLoop
+        # end if
+    # end while
+
+
+# end gameLoop
 
 gameConfig()
-
 sys.exit()
