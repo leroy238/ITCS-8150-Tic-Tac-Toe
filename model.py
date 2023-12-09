@@ -34,8 +34,8 @@ class Model:
         
         utility = -float('inf')
         maxAction = [0,0,0]
-        initialActions = possibleActions
-        for i, action in enumerate(possibleActions):#game.actions(state):
+        initialActions = possibleActions.copy()
+        for i, action in enumerate(initialActions):#game.actions(state):
             newState = game.result(state, action, 'max')
             possibleActions.pop(i)
             response = self.minSearch(newState, alpha, beta, depth+1, possibleActions)[0]
@@ -51,7 +51,7 @@ class Model:
             #end if
             
             alpha = max(alpha, utility)
-            possibleActions = initialActions
+            possibleActions = initialActions.copy()
         #end for
         
         return (utility, maxAction)
@@ -75,8 +75,8 @@ class Model:
         
         utility = float('inf')
         minAction = [0,0,0]
-        initialActions = possibleActions
-        for i, action in enumerate(possibleActions): #game.actions(state)
+        initialActions = possibleActions.copy()
+        for i, action in enumerate(initialActions): #game.actions(state)
             newState = game.result(state, action, 'min')
             possibleActions.pop(i)
             response = self.maxSearch(newState, alpha, beta, depth+1, possibleActions)[0]
@@ -91,7 +91,7 @@ class Model:
             #end if
             
             beta = min(beta, utility)
-            possibleActions = initialActions
+            possibleActions = initialActions.copy()
         #end for
         
         return (utility, minAction)

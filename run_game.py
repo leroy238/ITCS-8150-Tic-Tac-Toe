@@ -232,49 +232,12 @@ def winFound():
     # end if
 
     return winTuple[0]
-
-
 # end winFound
-
-
-# Setup game configuration
-def gameConfig():
-    global thisGame
-
-    while True:
-        gameStart = input("Would you like to start the game? [Y/N]")
-        if gameStart.upper() == "N":
-            print("Okay! Goodbye.")
-            pygame.quit()
-            break
-        elif gameStart.upper() == "Y":
-            difficulty = input("Difficulty level? [easy/difficult/insane]")
-
-            maxDepth = 0
-            if difficulty.lower() == "easy":
-                maxDepth = 2
-            elif difficulty.lower() == "difficult":
-                maxDepth = 4
-            elif difficulty.lower() == "insane":
-                maxDepth = 6
-            else:
-                print("Invalid difficulty!")
-            # end if/elif/else
-
-            thisGame = game.Game(maxDepth)
-        else:
-            print("Invalid answer!")
-        # end if/elif/else
-
-        gameLoop()
-    # end while
-
-
-# end gameConfig
-
 
 # Main game loop
 def gameLoop():
+    global thisGame
+
     running = True
     waiting_for_difficulty = True  # To wait for difficulty selection
     buttons = None  # To store buttons for difficulty selection
@@ -290,9 +253,8 @@ def gameLoop():
                 if level:
                     maxDepth = DIFFICULTY_LEVELS[level]
                     thisGame = game.Game(maxDepth)
-                    waiting_for_difficulty = (
-                        False  # Difficulty selected, start the game
-                    )
+                    waiting_for_difficulty = False # Difficulty selected, start the game
+                #end if
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # If the player clicks and a circle is placed
                 player_moved = handle_mouse_click(event.pos)
@@ -332,9 +294,7 @@ def gameLoop():
             pygame.display.flip()
         # end if
     # end while
-
-
 # end gameLoop
 
-gameConfig()
+gameLoop()
 sys.exit()
