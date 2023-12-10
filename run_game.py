@@ -18,7 +18,7 @@ PERSPECTIVE_OFFSET_Y = GRID_SIZE // 2  # Vertical offset for 3D effect
 CIRCLE_RADIUS = int(GRID_SIZE // 5)
 CROSS_SIZE = CIRCLE_RADIUS  # Size of the 'X' is the same as the circle
 
-#### Start of Constants for Level Selector Button ####
+#### Start of Constants for Level Selector Button and End game Button ####
 
 # Difficulty levels and their corresponding depths
 DIFFICULTY_LEVELS = {"easy": 2, "difficult": 4, "insane": 6}
@@ -37,7 +37,7 @@ TEXT_COLOR = (255, 255, 255)
 # Font for button text
 pygame.font.init()
 FONT = pygame.font.SysFont("Arial", 24)
-#### End of Constants for Level Selector Button ####
+#### End of Constants for Level Selector Button and End game buttons####
 
 
 # Setup the display
@@ -81,14 +81,39 @@ def draw_buttons():
     return buttons
 
 
+# Function to draw the 'Replay' and 'Quit' buttons and the outcome message
+def draw_end_game_buttons_and_message(winner):
+    message = f"{winner} has won!" if winner != "Tie" else "It's a tie!"
+
+    # Display the outcome message
+    message_surface = FONT.render(message, True, TEXT_COLOR)
+    screen.blit(message_surface, (WIDTH // 2 - 100, HEIGHT // 3))
+
+    # Buttons
+    replay_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT // 2, 100, 50)
+    quit_button = pygame.Rect(WIDTH // 2 + 50, HEIGHT // 2, 100, 50)
+
+    # Draw 'Replay' button
+    pygame.draw.rect(screen, BUTTON_COLOR, replay_button)
+    replay_text = FONT.render("Replay", True, TEXT_COLOR)
+    screen.blit(replay_text, (replay_button.x + 20, replay_button.y + 15))
+
+    # Draw 'Quit' button
+    pygame.draw.rect(screen, BUTTON_COLOR, quit_button)
+    quit_text = FONT.render("Quit", True, TEXT_COLOR)
+    screen.blit(quit_text, (quit_button.x + 20, quit_button.y + 15))
+
+    return replay_button, quit_button
+
+
 # Function to check for button clicks
 def check_button_clicks(pos, buttons):
-    # Iterate over the buttons and their rectangles
+    # Iterate over the buttons
     for level, rect in buttons.items():
-        # Check if the provided position (from a mouse click) is within the rectangle of a button
+        # Check if the provided position is within the button
         if rect.collidepoint(pos):
-            return level  # Return the difficulty level of the clicked button
-    return None  # Return None if no button was clicked
+            return level  # Return the difficulty level
+    return None
 
 
 # Function to draw all four layers
@@ -136,7 +161,7 @@ def draw_layers():
             pygame.draw.line(screen, LINE_COLOR, start_pos, end_pos)
 
 
-# Function to draw circles and 'X's based on the board state
+# Function to draw circles and X
 def draw_marks():
     board_state = thisGame.gameState.getState()
 
@@ -232,68 +257,101 @@ def winFound():
     # end if
 
     return winTuple[0]
+
+
 # end winFound
+
 
 # Main game loop
 def gameLoop():
     global thisGame
 
     running = True
-    waiting_for_difficulty = True  # To wait for difficulty selection
+    waiting_for_difficulty = True
     buttons = None  # To store buttons for difficulty selection
+    game_over = False
+    winner = None  # To store the winner
 
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            # This section of game_over check is  for handling the end-of-game scenario where it's necessary to determine the PLAYER interaction with the Replay and Quit buttons.
+            if game_over:
+                # Draw the end game buttons and message only if game is over
+                replay_button, quit_button = draw_end_game_buttons_and_message(winner)
+                # Handle end game scenario
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = event.pos
+                    if replay_button.collidepoint(mouse_pos):
+                        # Resetting the game state for replay
+                        thisGame = game.Game(thisGame.aiPlayer.maxLayers)
+                        game_over = False
+                        waiting_for_difficulty = True
+                        break  # Break out of the event loop to resTART the game
+                    elif quit_button.collidepoint(mouse_pos):
+                        running = False
+                        break  # Exit BOTH event loop and the game loop
 
-            if event.type == pygame.MOUSEBUTTONDOWN and waiting_for_difficulty:
+            elif event.type == pygame.MOUSEBUTTONDOWN and waiting_for_difficulty:
                 # Check if a difficulty button was clicked
                 level = check_button_clicks(event.pos, buttons)
                 if level:
                     maxDepth = DIFFICULTY_LEVELS[level]
                     thisGame = game.Game(maxDepth)
-                    waiting_for_difficulty = False # Difficulty selected, start the game
-                #end if
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+                    waiting_for_difficulty = (
+                        False  # Difficulty selected, start the game
+                    )
+                # end if
+
+            elif event.type == pygame.MOUSEBUTTONDOWN and not game_over:
                 # If the player clicks and a circle is placed
                 player_moved = handle_mouse_click(event.pos)
                 if player_moved:
-                    # Did player win?
+                    # Check if the player's move resulted in a win
                     if winFound():
-                        running = False
-                        screen.fill(BG_COLOR)
-                        draw_layers()
-                        draw_marks()
-                        pygame.display.flip()
-                        break
+                        game_over = True
+                        winner = "Player"
+                        continue  # Skip to the end of game handling
                     # end if
 
                     ai_make_move()  # AI makes a move after the player
-                    # Redraw the screen with the new marks
-                    screen.fill(BG_COLOR)
-                    draw_layers()
-                    draw_marks()
-                    pygame.display.flip()
 
+                    # Check if the AI's move resulted in a win
                     if winFound():
-                        running = False
-                        break
-                    # end if
+                        game_over = True
+                        winner = "AI"
+                        continue  # Skip to the end of game handling
 
-        # Draw the initial game state if the game is still running
-        if running:
+            # Redraw the screen based on the current state of the Game
             screen.fill(BG_COLOR)
             if waiting_for_difficulty:
                 # Draw buttons if waiting for difficulty selection
                 buttons = draw_buttons()
+            elif game_over:
+                # Draw the end game buttons and message
+                replay_button, quit_button = draw_end_game_buttons_and_message(winner)
+                for event in pygame.event.get():
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse_pos = event.pos
+                        if replay_button.collidepoint(mouse_pos):
+                            # Reset the game state and restart
+                            thisGame = game.Game(thisGame.aiPlayer.maxLayers)
+                            game_over = False
+                            waiting_for_difficulty = (
+                                True  # Reset to difficulty selection
+                            )
+                        elif quit_button.collidepoint(mouse_pos):
+                            # Quit the game
+                            running = False
             else:
-                # Draw the game if the difficulty has been selected
+                # Draw the game layers and marks
                 draw_layers()
                 draw_marks()
+
             pygame.display.flip()
-        # end if
-    # end while
+
+
 # end gameLoop
 
 gameLoop()
