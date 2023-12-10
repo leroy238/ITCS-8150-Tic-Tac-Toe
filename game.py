@@ -1,6 +1,7 @@
 import numpy as np
 import model
 from enum import Enum
+import itertools 
 
 class Turn(Enum):
     PLAYER = 1
@@ -28,7 +29,7 @@ class State:
     def __init__(self, layerKeys = []):
         self.gameRepresentation = np.zeros(shape=(4,4,4), dtype=int)
         if len(layerKeys) == 0:
-            self.layerKeys = _produceAllLoop(np.zeros(shape=(4,4), dtype=int)
+            self.layerKeys = self._produceAllLoop(np.zeros(shape=(4,4), dtype=int), 1)
         else:
             self.layerKeys = layerKeys
         #end if/else
@@ -95,25 +96,25 @@ class State:
         #end if/elif
         
         # Create extension directions.
-        extensions = []
-        for x in range(-1, 2):
-            for y in range(-1, 2):
-                for z in range(-1, 2):
-                    # Extension [0,0,0] is invalid.
-                    if x != 0 or y != 0 or z != 0:
-                        extensions.append(np.array([x,y,z]))
+        extensions = [np.array(list(pos)) for pos in itertools.product(range(-1, 2), range(-1,2), range(-1, 2)) if pos != (0, 0, 0)]
+        # for x in range(-1, 2):
+        #     for y in range(-1, 2):
+        #         for z in range(-1, 2):
+        #             # Extension [0,0,0] is invalid.
+        #             if x != 0 or y != 0 or z != 0:
+        #                 extensions.append(np.array([x,y,z]))
                     #end if
                 #end for
             #end for
         #end for
         
         # Produces all edge points. 
-        points = []
-        for x in range(4):
-            for y in range(4):
-                for z in range(4):
-                    if self.gameRepresentation[x,y,z] != 0:
-                        points.append(np.array([x,y,z]))
+        points = [np.array(list(pos)) for pos in itertools.product(range(4), range(4), range(4)) if self.gameRepresentation[pos[0], pos[1], pos[2]] != 0] # []
+        # for x in range(4):
+        #     for y in range(4):
+        #         for z in range(4):
+        #             if self.gameRepresentation[x,y,z] != 0:
+        #                 points.append(np.array([x,y,z]))
                     #end if
                 #end for
             #end for
