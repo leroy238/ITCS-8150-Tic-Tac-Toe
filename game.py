@@ -16,6 +16,7 @@ class State:
     gameRepresentation = None
     playerPlayed = None
     aiPlayed = None
+    layerKeys = None
     
     # __init__(self)
     #    Input: self (the object being instantiated)
@@ -24,9 +25,42 @@ class State:
     #
     #    Initializes the State object with an array of values, initially 0,
     #    0 meaning an empty board.
-    def __init__(self):
+    def __init__(self, layerKeys = []):
         self.gameRepresentation = np.zeros(shape=(4,4,4), dtype=int)
+        if len(layerKeys) == 0:
+            self.layerKeys = _produceAllLoop(np.zeros(shape=(4,4), dtype=int)
+        else:
+            self.layerKeys = layerKeys
+        #end if/else
     # end __init__
+    
+    def hash(self):
+        num = 0
+        for i in range(4):
+            num += self.layerKeys.index(self.gameRepresentation[i,:,:]) << 12
+        #end for
+        
+        return num
+    #end __hash__
+    
+    def _produceAllLoop(self, state, val):
+        #Produce all actions
+        actions = []
+        for x in range(4):
+            for y in range(4):
+                if state[x,y] == 0:
+                    actions.append((x,y))
+                #end if
+            #end for
+        #end for
+        
+        allStates = []
+        for action in actions:
+            state[action[0],action[1]] = val
+            allStates.append(self._produceAllLoop(state, -val))
+        #end for
+        return allStates
+    #end _produceAllLoop
 
     # isValidExtension(self, point, extension)
     # Input: self (the object), point (the position on the board), extension (the change to be applied to the position on the board)
@@ -224,7 +258,7 @@ class State:
     #
     #    Provides a copy of the State object.
     def copy(self):
-        copy_state = State()
+        copy_state = State(self.layerKeys)
         copy_state.setState(np.copy(self.getState()))
         copy_state.playerPlayed = self.playerPlayed
         copy_state.aiPlayed = self.aiPlayed
