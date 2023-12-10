@@ -16,62 +16,109 @@ class Model:
         self.maxLayers = maxLayers
     #end __init__
     
-    # _heuristicSort(self, played, actions, zeroIndex)
+    # _dist(self, point, playerPoint, aiPoint
     #    Input: self (the object)
-    #    played (Latest move played)
-    #    actions (List of actions)
-    #    zeroIndex (Index of the first element that doesn't have a positive heuristic)
+    #    point (Numpy array of coordinates on grid)
+    #    playerPoint (Numpy array of coordinates of last player move)
+    #    aiPoint (Numpy array of coordinates of last AI move)
     #
-    #    Output: List of actions (3-long numpy arrays) sorted in heuristic order
-    #    Integer of the new zeroIndex of the sorted list.
+    #    Output: Integer
     #
-    #    Returns a list of sorted actions based upon if they match a direction of the
-    #    dimension of a played move or not. Theoretically this puts moves in a line
-    #    going before those that aren't, making alpha-beta pruning more efficient.
-    #    It does miss some cases of 3D diagonals, but it needs to be fast to speed
-    #    up the algorithm.
-    def _heuristicSort(self, played, actions, zeroIndex):
-        sortedList = actions[:zeroIndex]
-        newIndex = len(sortedList)
-        for i in range(zeroIndex, len(actions)):
-            if np.any(np.isin(actions[i], played)):
-                sortedList.insert(0,actions[i])
-                newIndex += 1
-            else:
-                sortedList.append(actions[i])
-            #end if/else
-        #end for
-        
-        return sortedList, newIndex
-    #end _heuristicSort
+    #    Produces the sum of the distances between point and both previous move points.
+    def _dist(self, point, playerPoint, aiPoint):
+        # It is entirely possible for the AI to have not yet made a move.
+        if np.any(aiPoint == None):
+            return sum(point - playerPoint)
+        #end if
+        return sum(np.absolute((point - playerPoint)) + np.absolute((point - aiPoint)))
+    #end _dist
     
-    # maxSearch(self, state, alpha, beta, depth, zeroIndex, possibleActions)
+    # _merge(self, left, right)
+    #    Input: self (the object)
+    #    left (list of 3-long numpy arrays)
+    #    right (list of 3-long numpy arrays)
+    #
+    #    Output: List of 3-long numpy arrays
+    #
+    #    Merges the two input lists together in heuristic order, based on _dist.
+    def _merge(self, state, left, right):
+        array = []
+        playerPoint = state.getLastPlayed('player')
+        aiPoint = state.getLastPlayed('ai')
+    
+        i,j = (0,0)
+        while i < len(left) and j < len(right):
+            if self._dist(left[i], playerPoint, aiPoint) <= self._dist(right[i], playerPoint, aiPoint):
+                array.append(left[i])
+                i += 1
+            else:
+                array.append(right[j])
+                j += 1
+            #end if/else
+        #end while
+        
+        while i < len(left):
+            array.append(left[i])
+            i += 1
+        #end while
+        
+        while j < len(right):
+            array.append(right[j])
+            j += 1
+        #end while
+        
+        return array
+    #end _merge
+    
+    # _mergeSort(self, array)
+    #    Input: self (the object)
+    #    array (list of 3-long numpy arrays)
+    #
+    #    Output: List of 3-long numpy arrays
+    #
+    #    Heuristically sorts the input array.
+    def _mergeSort(self, state, array):
+        if len(array) > 1:
+            mid = len(array) // 2
+            left = array[:mid]
+            right = array[mid:]
+            
+            left = self._mergeSort(state, left)
+            right = self._mergeSort(state, right)
+            
+            array = self._merge(state, left, right)
+            
+            return array
+        else:
+            return array
+        #end if/else
+    #end _mergeSort
+    
+    # maxSearch(self, state, alpha, beta, depth, possibleActions)
     #    Input: self (the object)
     #    state (the current game state)
     #    alpha (the highest value seen in this path)
     #    beta (the lowest value seen in this path)
     #    depth (the current depth of the recursion)
-    #    zeroIndex (Index of the first element that doesn't have a positive heuristic)
     #    possibleActions (list of all possible actions)
     #
     #    Output: Float (the perceived value of this state)
     #    List (the list of actions to take after this state to get the best value)
     #
     #    Implements the search of the maximizing player in alpha-beta pruning.
-    def maxSearch(self, state, alpha, beta, depth, zeroIndex, possibleActions = []):
-        self.count += 1
+    def maxSearch(self, state, alpha, beta, depth, possibleActions = []):
         if self.maxLayers == depth or state.isWin()[0]:
             return (state.h(), [])
         #end if
         
-        possibleActions, zeroIndex = self._heuristicSort(state.getLastPlayed(), possibleActions, zeroIndex)
+        possibleActions = self._mergeSort(state, possibleActions)
         utility = -float('inf')
         maxAction = [0,0,0]
         initialActions = possibleActions.copy()
         for i, action in enumerate(initialActions):#game.actions(state):
             newState = game.result(state, action, 'max')
             possibleActions.pop(i)
-            response = self.minSearch(newState, alpha, beta, depth+1, zeroIndex, possibleActions)[0]
+            response = self.minSearch(newState, alpha, beta, depth+1, possibleActions)[0]
             del newState
             
             if response > utility:
@@ -90,33 +137,31 @@ class Model:
         return (utility, maxAction)
     #end maxSearch
     
-    # minSearch(self, state, alpha, beta, depth, zeroIndex, possibleActions)
+    # minSearch(self, state, alpha, beta, depth, possibleActions)
     #    Input: self (the object)
     #    state (the current game state)
     #    alpha (the highest value seen in this path)
     #    beta (the lowest value seen in this path)
     #    depth (the current depth of the recursion)
     #    possibleActions (list of all possible actions)
-    #    zeroIndex (Index of the first element that doesn't have a positive heuristic)
     #
     #    Output: Float (the perceived value of this state)
     #    List (the list of actions to take after this state to get the best value)
     #
     #    Implements the search of the minimizing player in alpha-beta pruning.
-    def minSearch(self, state, alpha, beta, depth, zeroIndex, possibleActions = []):
-        self.count += 1
+    def minSearch(self, state, alpha, beta, depth, possibleActions = []):
         if self.maxLayers == depth or state.isWin()[0]:
             return (state.h(), [])
         #end if
         
-        possibleActions, zeroIndex = self._heuristicSort(state.getLastPlayed(), possibleActions, zeroIndex)
+        possibleActions = self._mergeSort(state, possibleActions)
         utility = float('inf')
         minAction = [0,0,0]
         initialActions = possibleActions.copy()
         for i, action in enumerate(initialActions): #game.actions(state)
             newState = game.result(state, action, 'min')
             possibleActions.pop(i)
-            response = self.maxSearch(newState, alpha, beta, depth+1, zeroIndex, possibleActions)[0]
+            response = self.maxSearch(newState, alpha, beta, depth+1, possibleActions)[0]
             
             if response < utility:
                 minAction = action
@@ -145,7 +190,7 @@ class Model:
     #    given its heuristic evaluation of the state.
     def alphaBetaSearch(self, state):
         actions = game.actions(state)
-        response = self.maxSearch(state, -float('inf'), float('inf'), 0, 0, actions)
+        response = self.maxSearch(state, -float('inf'), float('inf'), 0, actions)
         
         return response[1]
     #end alphaBetaSearch

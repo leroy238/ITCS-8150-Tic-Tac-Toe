@@ -14,7 +14,8 @@ class Token(Enum):
 class State:
 
     gameRepresentation = None
-    played = None
+    playerPlayed = None
+    aiPlayed = None
     
     # __init__(self)
     #    Input: self (the object being instantiated)
@@ -163,8 +164,15 @@ class State:
     #    as a token for the player in the game's representation array.
     def play(self, x, y, z, player):
         if self.gameRepresentation[x,y,z] == 0:
-            self.gameRepresentation[x, y, z] = player.value if isinstance(player, Token) else player #1 if player.upper() == 'MAX' else -1
-            played = np.array([x,y,z]) # Store last played move.
+            self.gameRepresentation[x, y, z] = player.value if isinstance(player, Token) else player
+            
+            # Store last played move.
+            if (isinstance(player,Token) and player.value == -1) or player == -1:
+                self.playerPlayed = np.array([x,y,z])
+            else:
+                self.aiPlayed = np.array([x,y,z])
+            #end if
+            
             return True
         #end if
         
@@ -218,6 +226,8 @@ class State:
     def copy(self):
         copy_state = State()
         copy_state.setState(np.copy(self.getState()))
+        copy_state.playerPlayed = self.playerPlayed
+        copy_state.aiPlayed = self.aiPlayed
         return copy_state
     #end copy
     
@@ -344,12 +354,13 @@ class State:
     
     # getLastPlayed(self)
     #    Input: self (the object)
+    #    player (string describing the player whose move is wanted)
     #    
     #    Output: Numpy array of the last played move.
     #
     #    Retrieves the last played move from the state.
-    def getLastPlayed(self):
-        return self.played
+    def getLastPlayed(self, player):
+        return self.playerPlayed if player.lower() == 'player' else self.aiPlayed
     #end getLastPlayed    
 #end State
 
