@@ -308,6 +308,12 @@ def gameLoop():
                 # If the player clicks and a circle is placed
                 player_moved = handle_mouse_click(event.pos)
                 if player_moved:
+                    # Redraw screen.
+                    screen.fill(BG_COLOR)
+                    draw_layers()
+                    draw_marks()
+                    pygame.display.flip()
+                
                     # Check if the player's move resulted in a win
                     if winFound():
                         game_over = True
