@@ -2,6 +2,7 @@ import traceback
 import numpy as np
 from game import *
 import model
+import itertools
 
 
 mode = 'debug' #other mode is 'run'
@@ -125,6 +126,24 @@ def stateTest():
     assert(test_state.isWin()[0] and test_state.isWin()[1] == -1)
     
     del test_state
+    
+    test_state = State()
+    test_slice = [
+        [1,1,1,-1],
+        [1,1,1,-1],
+        [-1,-1,-1,1],
+        [-1,-1,1,1]
+    ]
+    neg_slice = [
+        [-1,-1,-1,1],
+        [-1,-1,-1,1],
+        [1,1,1,-1],
+        [1,1,-1,-1]
+    ]
+    test_values = np.array([test_slice,neg_slice,test_slice,neg_slice])
+    
+    test_state.setState(test_values)
+    assert(test_state.isWin()[0] and test_state.isWin()[1] == 0)
 #end stateTest
 
 def debug():

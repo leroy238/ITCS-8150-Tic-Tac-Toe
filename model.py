@@ -107,7 +107,10 @@ class Model:
     #
     #    Implements the search of the maximizing player in alpha-beta pruning.
     def maxSearch(self, state, alpha, beta, depth, possibleActions = []):
-        if self.maxLayers == depth or state.isWin()[0]:
+        turnsTaken = np.sum(np.abs(state.getState()))/2
+        if turnsTaken >= 4:
+            print('huh')
+        if self.maxLayers == depth or (turnsTaken >= 4 and state.isWin()[0]):
             return (state.h(), [])
         #end if
         

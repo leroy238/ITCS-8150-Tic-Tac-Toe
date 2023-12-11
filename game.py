@@ -27,14 +27,19 @@ class State:
     #
     #    Initializes the State object with an array of values, initially 0,
     #    0 meaning an empty board.
-    def __init__(self, layerKeys = []):
+    def __init__(self, layerKeys = [], transpositionTable = {}):
         self.gameRepresentation = np.zeros(shape=(4,4,4), dtype=int)
         if len(layerKeys) == 0:
             self.layerKeys = []
         else:
             self.layerKeys = layerKeys
         #end if/else
-        self.transpositionTable = {}
+        
+        if not(bool(transpositionTable)):
+            self.transpositionTable = {}
+        else:
+            self.tranpositionTable = transpositionTable
+        #end if/else
     # end __init__
     
     def hash(self):
@@ -69,7 +74,7 @@ class State:
     def h(self):
         selfKey = self.hash()
         if selfKey in self.transpositionTable:
-            return self.transpositionTable[selfKey]
+            return self.transpositionTable[selfKey][0]
         #end if
         
         # Create extension directions.
@@ -154,6 +159,7 @@ class State:
                 #end if/elif
                 
                 if count == 4:
+                    self.transpositionTable[selfKey] = (prevVal * 100, prevVal)
                     return prevVal * 100 # Is a win condition, +-100 score.
                 #end if
                 
@@ -161,7 +167,7 @@ class State:
             #end for
         #end for
         
-        self.transpositionTable[selfKey] = score
+        self.transpositionTable[selfKey] = (score, 0)
         return score
     # end h
     
@@ -240,7 +246,7 @@ class State:
     #
     #    Provides a copy of the State object.
     def copy(self):
-        copy_state = State(self.layerKeys)
+        copy_state = State(layerKeys = self.layerKeys, transpositionTable = self.transpositionTable)
         copy_state.setState(np.copy(self.getState()))
         copy_state.playerPlayed = self.playerPlayed
         copy_state.aiPlayed = self.aiPlayed
@@ -301,6 +307,12 @@ class State:
     #
     #    Tests if a state is won, and returns the player that won.
     def isWin(self):
+        selfKey = self.hash()
+        if selfKey in self.transpositionTable:
+            winTuple = self.transpositionTable[selfKey]
+            return (winTuple[0] == 100 or winTuple == -100, winTuple[1])
+        #end if
+    
         potWins = self._potWins()
         
         # Create extension directions.
@@ -346,6 +358,8 @@ class State:
                     
                     if winFound:
                         # Return win + player who won
+                        # Also track who won.
+                        self.transpositionTable[selfKey] = (val * 100, val)
                         return (True, val)
                     #end if
                 #end if
