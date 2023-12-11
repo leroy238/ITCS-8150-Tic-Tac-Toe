@@ -43,7 +43,7 @@ class State:
             return self.layerKeys.index(state)
         #end if
         self.layerKeys.append(state)
-        return len(self.layerKeys)
+        return len(self.layerKeys)-1
     #end __hash__
 
     # isValidExtension(self, point, extension)
