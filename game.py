@@ -18,6 +18,7 @@ class State:
     playerPlayed = None
     aiPlayed = None
     layerKeys = None
+    transpositionTable = None
     
     # __init__(self)
     #    Input: self (the object being instantiated)
@@ -29,39 +30,21 @@ class State:
     def __init__(self, layerKeys = []):
         self.gameRepresentation = np.zeros(shape=(4,4,4), dtype=int)
         if len(layerKeys) == 0:
-            self.layerKeys = self._produceAllLoop(np.zeros(shape=(4,4), dtype=int), 1)
+            self.layerKeys = []
         else:
             self.layerKeys = layerKeys
         #end if/else
+        self.transpositionTable = {}
     # end __init__
     
     def hash(self):
-        num = 0
-        for i in range(4):
-            num += self.layerKeys.index(self.gameRepresentation[i,:,:]) << 12
-        #end for
-        
-        return num
+        state = self.gameRepresentation
+        if state in self.layerKeys:
+            return self.layerKeys.index(state)
+        #end if
+        self.layerKeys.append(state)
+        return len(self.layerKeys)
     #end __hash__
-    
-    def _produceAllLoop(self, state, val):
-        #Produce all actions
-        actions = []
-        for x in range(4):
-            for y in range(4):
-                if state[x,y] == 0:
-                    actions.append((x,y))
-                #end if
-            #end for
-        #end for
-        
-        allStates = []
-        for action in actions:
-            state[action[0],action[1]] = val
-            allStates.append(self._produceAllLoop(state, -val))
-        #end for
-        return allStates
-    #end _produceAllLoop
 
     # isValidExtension(self, point, extension)
     # Input: self (the object), point (the position on the board), extension (the change to be applied to the position on the board)
@@ -84,6 +67,11 @@ class State:
     #    Negative values mean the minimizing player is in a better position,
     #    positive values mean the maximizing player is in a better position.
     def h(self):
+        selfKey = self.hash()
+        if selfKey in self.transpositionTable:
+            return self.transpositionTable[selfKey]
+        #end if
+    
         win, winner = self.isWin()
         # Check if max wins, if min wins, or if tie.
         if win and winner == 1:
@@ -97,28 +85,9 @@ class State:
         
         # Create extension directions.
         extensions = [np.array(list(pos)) for pos in itertools.product(range(-1, 2), range(-1,2), range(-1, 2)) if pos != (0, 0, 0)]
-        # for x in range(-1, 2):
-        #     for y in range(-1, 2):
-        #         for z in range(-1, 2):
-        #             # Extension [0,0,0] is invalid.
-        #             if x != 0 or y != 0 or z != 0:
-        #                 extensions.append(np.array([x,y,z]))
-                    #end if
-                #end for
-            #end for
-        #end for
         
         # Produces all edge points. 
-        points = [np.array(list(pos)) for pos in itertools.product(range(4), range(4), range(4)) if self.gameRepresentation[pos[0], pos[1], pos[2]] != 0] # []
-        # for x in range(4):
-        #     for y in range(4):
-        #         for z in range(4):
-        #             if self.gameRepresentation[x,y,z] != 0:
-        #                 points.append(np.array([x,y,z]))
-                    #end if
-                #end for
-            #end for
-        #end for
+        points = [np.array(list(pos)) for pos in itertools.product(range(4), range(4), range(4)) if self.gameRepresentation[pos[0], pos[1], pos[2]] != 0]
         
         startPoints = {(0,0,0)}
         for point in points:
@@ -163,8 +132,8 @@ class State:
                             tempScore += value * (count + 1)
                         else:
                             # Line is blocked. Should not encourage moves like this.
-                            count = 0
-                            continue
+                            tempScore = 0
+                            break
                         #end if/else
                     #end if
                     
@@ -181,6 +150,7 @@ class State:
             #end for
         #end for
         
+        self.transpositionTable[selfKey] = score
         return score
     # end h
     
