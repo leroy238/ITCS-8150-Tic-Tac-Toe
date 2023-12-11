@@ -28,11 +28,13 @@ class Model:
     #
     #    Produces the sum of the distances between point and both previous move points.
     def _dist(self, point, playerPoint, aiPoint):
+        playerSum = np.sum(np.absolute((point - playerPoint)))
         # It is entirely possible for the AI to have not yet made a move.
         if np.any(aiPoint == None):
-            return np.sum(np.absolute(point - playerPoint))
+            return (playerSum, 0)
         #end if
-        return np.sum(np.absolute((point - playerPoint)) + np.absolute((point - aiPoint)))
+        aiSum = np.sum(np.absolute((point - aiPoint)))
+        return (playerSum, aiSum)
     #end _dist
     
     # _merge(self, left, right)
@@ -43,14 +45,16 @@ class Model:
     #    Output: List of 3-long numpy arrays
     #
     #    Merges the two input lists together in heuristic order, based on _dist.
-    def _merge(self, state, left, right):
+    def _merge(self, state, left, right, player):
         array = []
-        playerPoint = state.getLastPlayed('player')
-        aiPoint = state.getLastPlayed('ai')
     
         i,j = (0,0)
         while i < len(left) and j < len(right):
-            if self._dist(left[i], playerPoint, aiPoint) <= self._dist(right[i], playerPoint, aiPoint):
+            leftResult = game.result(state, left[i], player)
+            rightResult = game.result(state, right[j], player)
+            hTable = self.transpositionTable
+            maxMinFix = 1 if player == 'max' else -1
+            if maxMinFix * leftResult.h(hTable) >= maxMinFix * rightResult.h(hTable):
                 array.append(left[i])
                 i += 1
             else:
@@ -79,16 +83,16 @@ class Model:
     #    Output: List of 3-long numpy arrays
     #
     #    Heuristically sorts the input array.
-    def _mergeSort(self, state, array):
+    def _mergeSort(self, state, array, player):
         if len(array) > 1:
             mid = len(array) // 2
             left = array[:mid]
             right = array[mid:]
             
-            left = self._mergeSort(state, left)
-            right = self._mergeSort(state, right)
+            left = self._mergeSort(state, left, player)
+            right = self._mergeSort(state, right, player)
             
-            array = self._merge(state, left, right)
+            array = self._merge(state, left, right, player)
             
             return array
         else:
@@ -114,7 +118,19 @@ class Model:
             return (state.h(self.transpositionTable), [])
         #end if
         
-        possibleActions = self._mergeSort(state, possibleActions)
+        noCull = []
+        for action in possibleActions:
+            playerMove = state.getLastPlayed('player')
+            aiMove = state.getLastPlayed('ai')
+            distance = self._dist(action, playerMove, aiMove)
+            if distance[0] > 3 or distance[1] > 3:
+                noCull.append(action)
+            #end if
+        #end for
+        possibleActions = noCull.copy()
+        del noCull
+        
+        #possibleActions = self._mergeSort(state, possibleActions, 'max')
         utility = -float('inf')
         maxAction = [0,0,0]
         initialActions = possibleActions.copy()
@@ -158,7 +174,19 @@ class Model:
             return (state.h(self.transpositionTable), [])
         #end if
         
-        possibleActions = self._mergeSort(state, possibleActions)
+        noCull = []
+        for action in possibleActions:
+            playerMove = state.getLastPlayed('player')
+            aiMove = state.getLastPlayed('ai')
+            distance = self._dist(action, playerMove, aiMove)
+            if distance[0] > 3 or distance[1] > 3:
+                noCull.append(action)
+            #end if
+        #end for
+        possibleActions = noCull.copy()
+        del noCull
+        
+        #possibleActions = self._mergeSort(state, possibleActions, 'min')
         utility = float('inf')
         minAction = [0,0,0]
         initialActions = possibleActions.copy()
