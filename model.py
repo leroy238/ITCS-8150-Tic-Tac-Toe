@@ -4,6 +4,7 @@ import game
 class Model:
     
     maxLayers = 0
+    transpositionTable = None
     
     # __init__(self)
     #    Input: self (the object being instantiated)
@@ -14,6 +15,7 @@ class Model:
     #    Initializes the Model object, with a maximum depth of alpha-beta pruning.
     def __init__(self, maxLayers):
         self.maxLayers = maxLayers
+        self.transpositionTable = dict()
     #end __init__
     
     # _dist(self, point, playerPoint, aiPoint
@@ -28,9 +30,9 @@ class Model:
     def _dist(self, point, playerPoint, aiPoint):
         # It is entirely possible for the AI to have not yet made a move.
         if np.any(aiPoint == None):
-            return sum(point - playerPoint)
+            return np.sum(np.absolute(point - playerPoint))
         #end if
-        return sum(np.absolute((point - playerPoint)) + np.absolute((point - aiPoint)))
+        return np.sum(np.absolute((point - playerPoint)) + np.absolute((point - aiPoint)))
     #end _dist
     
     # _merge(self, left, right)
@@ -107,18 +109,17 @@ class Model:
     #
     #    Implements the search of the maximizing player in alpha-beta pruning.
     def maxSearch(self, state, alpha, beta, depth, possibleActions = []):
-        turnsTaken = np.sum(np.abs(state.getState()))/2
-        if turnsTaken >= 4:
-            print('huh')
-        if self.maxLayers == depth or (turnsTaken >= 4 and state.isWin()[0]):
-            return (state.h(), [])
+        turnsTaken = np.sum(np.absolute(state.getState()))/2
+        if self.maxLayers == depth or (turnsTaken >= 4 and state.isWin(self.transpositionTable)[0]):
+            return (state.h(self.transpositionTable), [])
         #end if
         
         possibleActions = self._mergeSort(state, possibleActions)
         utility = -float('inf')
         maxAction = [0,0,0]
         initialActions = possibleActions.copy()
-        for i, action in enumerate(initialActions):#game.actions(state):
+        print(initialActions)
+        for i, action in enumerate(initialActions):
             newState = game.result(state, action, 'max')
             possibleActions.pop(i)
             response = self.minSearch(newState, alpha, beta, depth+1, possibleActions)[0]
@@ -153,8 +154,9 @@ class Model:
     #
     #    Implements the search of the minimizing player in alpha-beta pruning.
     def minSearch(self, state, alpha, beta, depth, possibleActions = []):
-        if self.maxLayers == depth or state.isWin()[0]:
-            return (state.h(), [])
+        turnsTaken = np.sum(np.absolute(state.getState()))/2
+        if self.maxLayers == depth or (turnsTaken >= 4 and state.isWin(self.transpositionTable)[0]):
+            return (state.h(self.transpositionTable), [])
         #end if
         
         possibleActions = self._mergeSort(state, possibleActions)

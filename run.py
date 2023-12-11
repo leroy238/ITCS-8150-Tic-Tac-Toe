@@ -59,7 +59,7 @@ def stateTest():
     assert(test_state.play(2,2,2,Token.AI))
     assert(test_state.play(3,3,3,Token.AI))
     
-    assert(test_state.isWin()[0] and test_state.isWin()[1] == 1)
+    assert(test_state.isWin(dict())[0] and test_state.isWin(dict())[1] == 1)
     
     del test_state
     
@@ -69,7 +69,7 @@ def stateTest():
     assert(test_state.play(0,1,2,Token.AI))
     assert(test_state.play(0,1,3,Token.AI))
     
-    assert(test_state.isWin()[0] and test_state.isWin()[1] == 1)
+    assert(test_state.isWin(dict())[0] and test_state.isWin(dict())[1] == 1)
     
     del test_state
     
@@ -79,7 +79,7 @@ def stateTest():
     assert(test_state.play(1,2,0,Token.AI))
     assert(test_state.play(1,3,0,Token.AI))
     
-    assert(test_state.isWin()[0] and test_state.isWin()[1] == 1)
+    assert(test_state.isWin(dict())[0] and test_state.isWin(dict())[1] == 1)
     
     del test_state
     
@@ -89,7 +89,7 @@ def stateTest():
     assert(test_state.play(2,1,0,Token.PLAYER))
     assert(test_state.play(3,1,0,Token.PLAYER))
     
-    assert(test_state.isWin()[0] and test_state.isWin()[1] == -1)
+    assert(test_state.isWin(dict())[0] and test_state.isWin(dict())[1] == -1)
     
     del test_state
     
@@ -99,7 +99,7 @@ def stateTest():
     assert(test_state.play(2,1,0,Token.PLAYER))
     assert(test_state.play(3,1,0,Token.AI))
     
-    assert(not(test_state.isWin()[0]) and test_state.isWin()[1] == 0)
+    assert(not(test_state.isWin(dict())[0]) and test_state.isWin(dict())[1] == 0)
     
     del test_state
     
@@ -111,7 +111,7 @@ def stateTest():
     test_values[0,3,3] = -1
     
     test_state.setState(test_values)
-    assert(test_state.isWin()[0] and test_state.isWin()[1] == -1)
+    assert(test_state.isWin(dict())[0] and test_state.isWin(dict())[1] == -1)
     
     del test_state
     
@@ -123,7 +123,7 @@ def stateTest():
     test_values[0,0,3] = -1
     
     test_state.setState(test_values)
-    assert(test_state.isWin()[0] and test_state.isWin()[1] == -1)
+    assert(test_state.isWin(dict())[0] and test_state.isWin(dict())[1] == -1)
     
     del test_state
     
@@ -143,7 +143,7 @@ def stateTest():
     test_values = np.array([test_slice,neg_slice,test_slice,neg_slice])
     
     test_state.setState(test_values)
-    assert(test_state.isWin()[0] and test_state.isWin()[1] == 0)
+    assert(test_state.isWin(dict())[0] and test_state.isWin(dict())[1] == 0)
 #end stateTest
 
 def debug():

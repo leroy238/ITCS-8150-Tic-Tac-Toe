@@ -238,7 +238,7 @@ def ai_make_move():
 
 
 def winFound():
-    winTuple = thisGame.gameState.isWin()
+    winTuple = thisGame.gameState.isWin(dict())
     winner = ""
     if winTuple[1] == -1:  # Player is min player
         winner = "Player"
