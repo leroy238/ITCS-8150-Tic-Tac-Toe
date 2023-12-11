@@ -38,7 +38,7 @@ class State:
     # end __init__
     
     def hash(self):
-        state = self.gameRepresentation
+        state = self.gameRepresentation.tolist()
         if state in self.layerKeys:
             return self.layerKeys.index(state)
         #end if
