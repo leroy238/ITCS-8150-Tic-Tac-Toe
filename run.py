@@ -111,6 +111,20 @@ def stateTest():
     
     test_state.setState(test_values)
     assert(test_state.isWin()[0] and test_state.isWin()[1] == -1)
+    
+    del test_state
+    
+    test_state = State()
+    test_values = np.zeros((4,4,4))
+    test_values[3,3,0] = -1
+    test_values[2,2,1] = -1
+    test_values[1,1,2] = -1
+    test_values[0,0,3] = -1
+    
+    test_state.setState(test_values)
+    assert(test_state.isWin()[0] and test_state.isWin()[1] == -1)
+    
+    del test_state
 #end stateTest
 
 def debug():

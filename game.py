@@ -71,23 +71,17 @@ class State:
         if selfKey in self.transpositionTable:
             return self.transpositionTable[selfKey]
         #end if
-    
-        win, winner = self.isWin()
-        # Check if max wins, if min wins, or if tie.
-        if win and winner == 1:
-            return 100
-        elif win and winner == -1:
-            return -100
-        elif win and winner == 0:
-            #Heuristic is negative since the AI is maximizing.
-            return -20
-        #end if/elif
         
         # Create extension directions.
         extensions = [np.array(list(pos)) for pos in itertools.product(range(-1, 2), range(-1,2), range(-1, 2)) if pos != (0, 0, 0)]
         
         # Produces all edge points. 
         points = [np.array(list(pos)) for pos in itertools.product(range(4), range(4), range(4)) if self.gameRepresentation[pos[0], pos[1], pos[2]] != 0]
+        
+        if len(points) == 64: # All points are played tie.
+            # Heuristic is negative since the AI is maximizing.
+            return -20
+        #end if
         
         startPoints = {(0,0,0)}
         for point in points:
@@ -101,9 +95,12 @@ class State:
             startPoints.add((0,0,z))
             startPoints.add((0,y,0))
             startPoints.add((x,0,0))
+            startPoints.add((x,y,z))
         #end for
         # Now only contains valid starting positions
         points = [np.array([point[0], point[1], point[2]]) for point in startPoints]
+        corners = [np.array([point[0], point[1], point[2]]) for point in itertools.product((0,3), repeat=3)]
+        points = points + corners # Impossible to otherwise see 3D diagonal wins on corners.
         
         score = 0
         
@@ -116,8 +113,9 @@ class State:
                 prevVal = 0
                 count = 0
                 tempScore = 0
+                thisPoint = point.copy()
                 for num in range(3):
-                    value = self.gameRepresentation[point[0], point[1], point[2]]
+                    value = self.gameRepresentation[thisPoint[0], thisPoint[1], thisPoint[2]]
                     # Point has a value in it.
                     if value != 0:
                         if prevVal == 0:
@@ -131,22 +129,35 @@ class State:
                             count += 1
                             tempScore += value * (count + 1)
                         else:
-                            # Line is blocked. Should not encourage moves like this.
+                            # Line is blocked, zero out score of the line.
+                            count = 0
                             tempScore = 0
                             break
                         #end if/else
                     #end if
                     
-                    score += tempScore
-                    
                     # We want to encourage points even if they are not directly
                     # in a line. No case for value is 0 is necessary.
                     
-                    point[0] += direction[0]
-                    point[1] += direction[1]
-                    point[2] += direction[2]
-                    
+                    thisPoint[0] += direction[0]
+                    thisPoint[1] += direction[1]
+                    thisPoint[2] += direction[2]
                 #end for
+                
+                value = self.gameRepresentation[thisPoint[0], thisPoint[1], thisPoint[2]]
+                if value != 0 and prevVal == value:
+                    count += 1
+                    tempScore += value * (count + 1)
+                elif value != 0:
+                    count = 0
+                    tempScore = 0
+                #end if/elif
+                
+                if count == 4:
+                    return prevVal * 100 # Is a win condition, +-100 score.
+                #end if
+                
+                score += tempScore
             #end for
         #end for
         
