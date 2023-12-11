@@ -118,7 +118,6 @@ class Model:
         utility = -float('inf')
         maxAction = [0,0,0]
         initialActions = possibleActions.copy()
-        print(initialActions)
         for i, action in enumerate(initialActions):
             newState = game.result(state, action, 'max')
             possibleActions.pop(i)
