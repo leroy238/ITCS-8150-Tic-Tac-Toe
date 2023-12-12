@@ -43,12 +43,7 @@ class State:
     #
     #    Produces an integer that represents this current game state.
     def hash(self):
-        state = self.gameRepresentation.tolist()
-        if state in self.layerKeys:
-            return self.layerKeys.index(state)
-        #end if
-        self.layerKeys.append(state)
-        return len(self.layerKeys)-1
+        return self.gameRepresentation.data.tobytes()
     #end __hash__
 
     # isValidExtension(self, point, extension)
@@ -74,9 +69,16 @@ class State:
     #    positive values mean the maximizing player is in a better position.
     def h(self, transpositionTable):
         selfKey = self.hash()
+        try:
+            return transpositionTable[selfKey][0]
+        except Exception:
+            'Hash not present.'
+        #end try/except
+        '''
         if selfKey in transpositionTable:
             return transpositionTable[selfKey][0]
         #end if
+        '''
         
         # Create extension directions.
         extensions = [np.array(list(pos)) for pos in itertools.product(range(-1, 2), range(-1,2), range(-1, 2)) if pos != (0, 0, 0)]

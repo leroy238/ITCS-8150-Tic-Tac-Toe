@@ -130,11 +130,12 @@ class Model:
         possibleActions = noCull.copy()
         del noCull
         
-        #possibleActions = self._mergeSort(state, possibleActions, 'max')
+        possibleActions = self._mergeSort(state, possibleActions, 'max')
         utility = -float('inf')
         maxAction = [0,0,0]
         initialActions = possibleActions.copy()
-        for i, action in enumerate(initialActions):
+        maxIndex = max(10, len(initialActions))
+        for i, action in enumerate(initialActions[:maxIndex]):
             newState = game.result(state, action, 'max')
             possibleActions.pop(i)
             response = self.minSearch(newState, alpha, beta, depth+1, possibleActions)[0]
@@ -186,11 +187,12 @@ class Model:
         possibleActions = noCull.copy()
         del noCull
         
-        #possibleActions = self._mergeSort(state, possibleActions, 'min')
+        possibleActions = self._mergeSort(state, possibleActions, 'min')
         utility = float('inf')
         minAction = [0,0,0]
         initialActions = possibleActions.copy()
-        for i, action in enumerate(initialActions): #game.actions(state)
+        maxIndex = max(10, len(initialActions))
+        for i, action in enumerate(initialActions[:maxIndex]):
             newState = game.result(state, action, 'min')
             possibleActions.pop(i)
             response = self.maxSearch(newState, alpha, beta, depth+1, possibleActions)[0]
