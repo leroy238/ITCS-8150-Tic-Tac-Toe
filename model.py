@@ -130,7 +130,9 @@ class Model:
         possibleActions = noCull.copy()
         del noCull
         
-        possibleActions = self._mergeSort(state, possibleActions, 'max')
+        if self.maxLayers - depth > 1:
+            possibleActions = self._mergeSort(state, possibleActions, 'max')
+        #end if
         utility = -float('inf')
         maxAction = [0,0,0]
         initialActions = possibleActions.copy()
@@ -187,7 +189,10 @@ class Model:
         possibleActions = noCull.copy()
         del noCull
         
-        possibleActions = self._mergeSort(state, possibleActions, 'min')
+        # Wasting time to do this at the node before the leaves.
+        if self.maxLayers - depth > 1:
+            possibleActions = self._mergeSort(state, possibleActions, 'min')
+        #end if
         utility = float('inf')
         minAction = [0,0,0]
         initialActions = possibleActions.copy()
