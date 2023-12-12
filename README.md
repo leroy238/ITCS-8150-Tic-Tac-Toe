@@ -4,7 +4,11 @@ This is a 3D Tic Tac Toe game created as a final project for the course ITCS-815
 
 # Execution Instructions
 
-**IN PROGRESS**
+Run the command:
+```
+python3 run_game.py
+```
+to execute the code.
 
 # Contributors
 
