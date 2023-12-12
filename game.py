@@ -17,8 +17,6 @@ class State:
     gameRepresentation = None
     playerPlayed = None
     aiPlayed = None
-    layerKeys = None
-    transpositionTable = None
     
     # __init__(self)
     #    Input: self (the object being instantiated)
@@ -27,13 +25,8 @@ class State:
     #
     #    Initializes the State object with an array of values, initially 0,
     #    0 meaning an empty board.
-    def __init__(self, layerKeys = []):
+    def __init__(self):
         self.gameRepresentation = np.zeros(shape=(4,4,4), dtype=int)
-        if len(layerKeys) == 0:
-            self.layerKeys = []
-        else:
-            self.layerKeys = layerKeys
-        #end if/else
     # end __init__
     
     # hash(self)
@@ -47,9 +40,13 @@ class State:
     #end __hash__
 
     # isValidExtension(self, point, extension)
-    # Input: self (the object), point (the position on the board), extension (the change to be applied to the position on the board)
+    #    Input: self (the object), point (the position on the board)
+    #    extension (the change to be applied to the position on the board)
     #
-    # Output: boolean (whether or not the extension results in a position that is still on the board) 
+    #    Output: boolean (whether or not the extension results in a position that is 
+    #    still on the board) 
+    #
+    #    Checks if an extension direction is valid.
     def isValidExtension(self, point: [int, int, int], extension: [int, int, int]):
         xExtend = point[0] + 3 * extension[0]
         yExtend = point[1] + 3 * extension[1]
@@ -249,7 +246,7 @@ class State:
     #
     #    Provides a copy of the State object.
     def copy(self):
-        copy_state = State(layerKeys = self.layerKeys)
+        copy_state = State()
         copy_state.setState(np.copy(self.getState()))
         copy_state.playerPlayed = self.playerPlayed
         copy_state.aiPlayed = self.aiPlayed
@@ -417,53 +414,6 @@ class Game:
         
         self.turn = Turn.PLAYER
     #end __init__
-    
-    # run(self)
-    #    Input: self (the object)
-    #
-    #    Output: None (Side effect of printing out who won)
-    #
-    #    Starts the game, ending when the game is finished and printing out who won.
-    def run(self):
-        winTuple = self.gameState.isWin()
-    
-        while(not winTuple[0]):
-            if self.turn == Turn.PLAYER:
-                # Temporary system of taking in a player's turn.
-                playerTurn = input("Input your turn. Do this in the format 'x, y, z'")
-                
-                turnVal = np.array([0,0,0])
-                count = 0
-                
-                for val in playerTurn.split(', '):
-                    turnVal[count] = int(val)
-                    count += 1
-                #end for
-                
-                self.gameState.play(turnVal[0], turnVal[1], turnVal[2], Token.PLAYER)
-            else:
-                currState = self.gameState.getState()
-                turnVal = self.aiPlayer.alphaBetaSearch(currState)
-                
-                self.gameState.play(turnVal[0], turnVal[1], turnVal[2], Token.AI)
-            #end if/else
-            
-            # Temporary method of making the game state visible to the player.
-            print(self.gameState.getState())
-            
-            winTuple = self.gameState.isWin()
-        #end while
-        
-        winner = ''
-        if winTuple[1] == 1:
-            winner = 'Player'
-        else:
-            winner = 'AI'
-        #end if/else
-        
-        print(winner + ' has won!')
-    #end run
-
 #end Game
 
 # actions(state)
@@ -488,6 +438,15 @@ def actions(state):
     return actions
 #end actions
 
+# result(state, action, player)
+#    Input: state (the state of the game being played)
+#    action (3-long Numpy array of coordinates to play at)
+#    player (String of who is playing, 'max' or 'min')
+#
+#    Output: State
+#
+#    Auxillary function to make a copy of a state and play a move on it. Used to aid
+#    the AI.
 def result(state, action, player):
     newState = state.copy()
     
