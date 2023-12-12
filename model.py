@@ -27,6 +27,7 @@ class Model:
     #    Output: Integer
     #
     #    Produces the sum of the distances between point and both previous move points.
+    #    Distance is not Euclidean, since this is a grid.
     def _dist(self, point, playerPoint, aiPoint):
         playerSum = np.sum(np.absolute((point - playerPoint)))
         # It is entirely possible for the AI to have not yet made a move.
@@ -41,6 +42,7 @@ class Model:
     #    Input: self (the object)
     #    left (list of 3-long numpy arrays)
     #    right (list of 3-long numpy arrays)
+    #    player ('max' or 'min')
     #
     #    Output: List of 3-long numpy arrays
     #
@@ -52,9 +54,25 @@ class Model:
         while i < len(left) and j < len(right):
             leftResult = game.result(state, left[i], player)
             rightResult = game.result(state, right[j], player)
+            
             hTable = self.transpositionTable
             maxMinFix = 1 if player == 'max' else -1
-            if maxMinFix * leftResult.h(hTable) >= maxMinFix * rightResult.h(hTable):
+            
+            leftVal = maxMinFix * leftResult.h(hTable)
+            rightVal = maxMinFix * rightResult.h(hTable)
+            
+            # If the values are bad, we don't care about them.
+            if leftVal <= -400:
+                i += 1
+                continue
+            #end if
+            
+            if rightVal <= -400:
+                j += 1
+                continue
+            #end if
+            
+            if leftVal >= rightVal:
                 array.append(left[i])
                 i += 1
             else:
@@ -72,6 +90,11 @@ class Model:
             array.append(right[j])
             j += 1
         #end while
+        
+        # If all values are bad, just pick something.
+        if len(array) == 0:
+            array = [left[i]]
+        #end if
         
         return array
     #end _merge
@@ -136,6 +159,10 @@ class Model:
         utility = -float('inf')
         maxAction = [0,0,0]
         initialActions = possibleActions.copy()
+        
+        # Complexity of evaluation is just too high to check all possible actions.
+        # Faced with the choice of iterative deepening versus beam search, we went
+        # with beam search.
         maxIndex = max(10, len(initialActions))
         for i, action in enumerate(initialActions[:maxIndex]):
             newState = game.result(state, action, 'max')

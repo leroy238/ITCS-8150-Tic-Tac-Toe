@@ -162,8 +162,8 @@ class State:
                 #end if/elif
                 
                 if count == 4:
-                    transpositionTable[selfKey] = (prevVal * 100, prevVal)
-                    return prevVal * 100 # Is a win condition, +-100 score.
+                    transpositionTable[selfKey] = (prevVal * 10000, prevVal)
+                    return prevVal * 10000 # Is a win condition, +-10000 score.
                 #end if
                 
                 score += tempScore
@@ -313,7 +313,7 @@ class State:
         selfKey = self.hash()
         if selfKey in transpositionTable:
             winTuple = transpositionTable[selfKey]
-            return (winTuple[0] == 100 or winTuple == -100, winTuple[1])
+            return (winTuple[0] == 10000 or winTuple == -10000, winTuple[1])
         #end if
     
         potWins = self._potWins()
@@ -362,7 +362,7 @@ class State:
                     if winFound:
                         # Return win + player who won
                         # Also track who won.
-                        transpositionTable[selfKey] = (val * 100, val)
+                        transpositionTable[selfKey] = (val * 10000, val)
                         return (True, val)
                     #end if
                 #end if
